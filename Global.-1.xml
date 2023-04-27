@@ -1,4 +1,4 @@
 <Panel>
-<InputField id = "ipaddress_input" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onEndEdit = "storeIPAddress" position = "-325 450 0" placeholder = "Input IP Address:"></InputField>
-<Button id = "change_ipaddress" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="changeIPAddress" position = "-325 450 0" width = "160" height = "30">Change IP Address</Button>
+<InputField id = "ipaddress_input" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onEndEdit = "storeIPAddress" position = "-325 450 0" placeholder = "Input IP Address:"></InputField>
+<Button id = "change_ipaddress" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="changeIPAddress" position = "-325 450 0" width = "160" height = "30">Change IP Address</Button>
 </Panel>

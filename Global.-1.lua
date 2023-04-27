@@ -18,22 +18,23 @@ end
 function storeIPAddress(player, ipAddress, id)
     IP_ADDRESS = ipAddress
     print("The current IP Address is: " .. ipAddress)
-    UI.show(changeIPAddressID)
-    UI.hide(inputIPAddressID)
+    UI.setAttribute(changeIPAddressID, "active", "true")
+    UI.setAttribute(changeIPAddressID, "visibility", "host")
+    UI.setAttribute(inputIPAddressID, "active", "false")
     UI.setAttribute(changeIPAddressID, "text",IP_ADDRESS)
     loadPlayerData()
 end
 
 function changeIPAddress()
-    UI.show(inputIPAddressID)
-    UI.hide(changeIPAddressID)
+    UI.setAttribute(inputIPAddressID, "active", "true")
+    UI.setAttribute(inputIPAddressID, "visibility", "host")
+    UI.setAttribute(changeIPAddressID, "active", "false")
 end
 
 function loadPlayerData()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_PCS_PATH
     print("url: " .. url)
     WebRequest.get(url, function(request)
-        UI.show(changeIPAddressID)
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
