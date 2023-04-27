@@ -2,6 +2,7 @@
 IP_ADDRESS = nil
 PORT = "9001"
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
+GET_PCS_PATH = "/playermenu/getpcs"
 changeIPAddressID = "change_ipaddress"
 inputIPAddressID = "ipaddress_input"
 --[[ The onLoad event is called after the game save finishes loading. --]]
@@ -29,9 +30,12 @@ function changeIPAddress()
 end
 
 function loadPlayerData()
-    WebRequest.get(IP_ADDRESS .. ":" .. PORT .. GET_INITIATIVE_PATH, function(request)
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_PCS_PATH
+    print("url: " .. url)
+    WebRequest.get(url, function(request)
         UI.show(changeIPAddressID)
         if request.is_error then
+            print("error: " .. request.error)
             log(request.error)
         else
             broadcastToAll(request.text)
