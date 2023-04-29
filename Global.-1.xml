@@ -1,7 +1,10 @@
-<Panel>
+<Panel id = "firstPanel">
 <!-- Ip address entry & game start -->
 <InputField id = "ipaddress_input" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onEndEdit = "storeIPAddress" position = "600 500 0" placeholder = "Input IP Address:"></InputField>
 <Button id = "change_ipaddress" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="changeIPAddress" position = "600 500 0" width = "160" height = "30">Change IP Address</Button>
+</Panel>
+
+<Panel id = "secondPanel">
 <!-- Display all PCs -->
 <Button id = "text_button" position = "0 330 0" width = "700" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
 <GridLayout id = "pc_list" childAlignment = "upperCenter" padding = "250 250 250 250" spacing = "20 10" cellSize = "300 75" active = "false">
@@ -34,4 +37,28 @@
 <!-- GM initiative display & button -->
 <Button id = "text_button_2" visibility = "host" position = "0 -150 0" width = "400" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
 <Button id = "gm_roll_initiative" visibility = "host" position = "0 -200 0" width = "200" height = "50" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll initiative!</Button>
+</Panel>
+
+<Panel id = "thirdPanel">
+<!-- turn order -->
+<Button onClick = "buildInitiativeRow" width = "160" height = "30">Print Chars</Button>
+
+<VerticalScrollView active = "false" width = "20%" height = "40%" rectAlignment = "UpperCenter" offsetXY = "0 -100" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <VerticalLayout>
+            <Button width = "100" height = "30">1</Button>
+            <Button width = "100" height = "30">2</Button>
+            <Button width = "100" height = "30">3</Button>
+            <Button width = "100" height = "30">4</Button>
+    </VerticalLayout>
+</VerticalScrollView>
+
+<HorizontalScrollView id = "h_scrollView" active = "true" width = "40%" height = "5%" rectAlignment = "UpperCenter" offsetXY = "0 -100" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <HorizontalLayout id = "initiative_row">
+        <Panel id = "innerPanelLeft">
+        <!-- remove the nested inner panel left this is just here for testing -->
+            <Panel id = "nestedInnerPanelLeft"></Panel>
+        </Panel>
+        <Panel id = "innerPanelRight"></Panel>
+    </HorizontalLayout>
+</HorizontalScrollView>
 </Panel>
