@@ -17,6 +17,18 @@ inputIPAddressID = "ipaddress_input"
 pcListID = "pc_list"
 textButtonID = "text_button"
 requestInitiativeID = "requestInit"
+blueInitiativeID = "blueInitiative"
+purpleInitiativeID = "purpleInitiative"
+greenInitiativeID = "greenInitiative"
+orangeInitiativeID = "orangeInitiative"
+tealInitiativeID = "tealInitiative"
+brownInitiativeID = "brownInitiative"
+pinkInitiativeID = "pinkInitiative"
+redInitiativeID = "redInitiative"
+yellowInitiativeID = "yellowInitiative"
+whiteInitiativeID = "whiteInitiative"
+gmInitiativeID = "gm_roll_initiative"
+gmInitTextID = "text_button_2"
 
 -- Core functions:
 
@@ -71,7 +83,7 @@ end
 -- UI functions:
 
 function displayPcs(pcList)
-    -- for each PC, activate a button (max 12 PCs)
+    -- for each PC, activate a button (max 10 PCs)
     pcListList = mysplit(shaveString(pcList), ",")
     numberOfPCs = #(pcListList)
 
@@ -92,7 +104,113 @@ function displayTurnOrder()
 end
 
 function requestInitiative()
+    numberInitspopulated = 0
+    initNameList = ""
+    initListForDisplay = ""
+    initNamesJson = {}
     broadcastToAll("It\'s time to roll initiative!")
+    -- for each color, if a PC, activate that UI element to request init
+    if isNotEmpty(playerColorMap.White) then
+        UI.setAttribute(whiteInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Red) then
+        UI.setAttribute(redInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Orange) then
+        UI.setAttribute(orangeInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Brown) then
+        UI.setAttribute(brownInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Pink) then
+        UI.setAttribute(pinkInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Purple) then
+        UI.setAttribute(purpleInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Yellow) then
+        UI.setAttribute(yellowInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Blue) then
+        UI.setAttribute(blueInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Green) then
+        UI.setAttribute(greenInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Teal) then
+        UI.setAttribute(tealInitiativeID, "active", "true")
+    end
+    -- now hide the button
+    UI.setAttribute(requestInitiativeID, "active", "false")
+end
+
+function addPlayerInitiative(player, initTotal, id)
+    UI.setAttribute(id, "active", "false")
+    -- when entered, populates DM's init popup
+    -- find player name
+    if player.color == "Purple" then
+        playerName = playerColorMap.Purple
+    else
+        if player.color == "Red" then
+            playerName = playerColorMap.Red
+        else
+            if player.color == "Blue" then
+                playerName = playerColorMap.Blue
+            else
+                if player.color == "Orange" then
+                    playerName = playerColorMap.Orange
+                else
+                    if player.color == "Green" then
+                        playerName = playerColorMap.Green
+                    else
+                        if player.color == "Brown" then
+                            playerName = playerColorMap.Brown
+                        else
+                            if player.color == "Yellow" then
+                                playerName = playerColorMap.Yellow
+                            else
+                                if player.color == "Teal" then
+                                    playerName = playerColorMap.Teal
+                                else
+                                    if player.color == "White" then
+                                        playerName = playerColorMap.White
+                                    else
+                                        if player.color == "Pink" then
+                                            playerName = playerColorMap.Pink
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    print("player name: " .. playerName)
+    addNameToGMPopup(playerName, initTotal)
+end
+
+function addNameToGMPopup(pName, initiativeTotal)
+        -- add name to JSON list
+        initNameList = initNameList .. pName .. ":" .. initiativeTotal .. ", "
+        table.insert(initNamesJson, "\""..pName.."\":\""..initiativeTotal.."\"")
+        print("initNamesJson:")
+        for n=1, #(initNamesJson), 1 do
+            print(initNamesJson[n])
+        end
+        -- display list to GM
+        initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
+        UI.setAttribute(gmInitTextID, "active", "true")
+        UI.setAttribute(gmInitTextID, "text", initListForDisplay)
+        UI.setAttribute(gmInitiativeID, "active", "true")
+        UI.setAttribute(gmInitiativeID, "color", SELECTED_GREY)
+
+        numberInitspopulated = numberInitspopulated + 1
+        -- when all populated, give the DM the roll button!
+        if numberInitspopulated == numberOfPCs then
+            UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
+        end
 end
 
 function playerSelected(player, name, id)
@@ -130,10 +248,10 @@ function checkIfAllPCsSelected()
         
     end
 
-    -- if foundNames == numberOfPCs then -- close the PC selector
+    if foundNames == numberOfPCs then -- close the PC selector
         closePcSelector()
         UI.setAttribute(requestInitiativeID, "active", "true")
-    -- end
+    end
 end
 
 function closePcSelector()
@@ -222,6 +340,13 @@ function addToMap(name)
             -- print(request.text);
         end
     end)
+end
+
+function rollGmInitiative()
+    UI.setAttribute(gmInitTextID, "active", "false")
+    UI.setAttribute(gmInitiativeID, "active", "false")
+    UI.setAttribute(requestInitiativeID, "active", "true")
+
 
 end
 
@@ -242,6 +367,10 @@ function mysplit (inputstr, sep)
     return t
 end
 
+function isNotEmpty(s)
+    return s ~= nil and s ~= ''
+end
+
 -- User interface:
 
 -- 0) spawn in object / code for GUI from workshop
@@ -254,5 +383,6 @@ end
 -- 6) Display live turn order (updatable by the GM via the server)
 -- 7) On a player's turn, they can end their turn, advancing to the next player ('your turn' notification?).
 --   7.5) GM can end any turn.
+-- 8) GM can also refresh turn order
 
 -- future: add funtion to 'reveal' enemy attacks, weakneses or reactions!
