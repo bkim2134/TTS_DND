@@ -56,10 +56,14 @@ BUTTON_COLOR_8 = "#e48b07"
 BUTTON_COLOR_9 = "#00ffcc"
 BUTTON_COLOR_10 = "#009933"
 BUTTON_COLOR_11 = "#ebebeb"
-BUTTON_COLOR_12 = "#bdbdbd" -- can the .xml file refer to these constants?
+BUTTON_COLOR_12 = "#bdbdbd"
+ATTRIBUTES = "attributes"
+ID = "id"
+CHILDREN = "children"
 
 -- Game variables:
 
+characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"} -- to remove!
 playerColorMap = {White = "", Red = "", Brown = "", Orange = "", Yellow = "", Green = "", Teal = "", Blue = "", Purple = "", Pink = ""}
 
 -- Network functions:
@@ -101,6 +105,51 @@ function displayPcs(pcList)
 end
 
 function displayTurnOrder()
+end
+
+function getElementByIdFromRoot(root, id)
+    for _,childTable in pairs(root) do
+        local table = childTable
+        local foundElement = getElementById(table, id)
+        if foundElement != nil then 
+            return foundElement
+        end
+    end
+    return nil
+end
+
+function getElementById(xmlTable, id)
+    local parentTable = xmlTable
+
+    if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+        return parentTable
+
+    else
+            if type(parentTable[CHILDREN]) == "table" then
+                for _, childTable in pairs(parentTable[CHILDREN]) do
+                    parentTable = childTable
+                    local foundElement = getElementById(parentTable,id)
+                    if foundElement != nil then
+                        return foundElement
+                    end
+                end  
+            end
+
+    end
+
+    return nil
+end
+
+function buildInitiativeRow()
+
+local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+broadcastToAll(gottenElement[ATTRIBUTES][ID])
+    --we have to locate the xml element that will contain 
+
+    for _, characterName in ipairs(characters) do
+        broadcastToAll(characterName)
+    end
 end
 
 function requestInitiative()
