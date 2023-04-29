@@ -7,8 +7,12 @@ IP_ADDRESS = nil
 PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
+ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
 GET_PCS_PATH = "/playermenu/getpcs"
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
+NEXT_TURN_PATH = "/playermenu/nextturn"
+GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
+GET_NEXT_PLAYER_PATH = "/playermenu/getnextcharacter"
 
 -- XML ids:
 
@@ -29,6 +33,13 @@ yellowInitiativeID = "yellowInitiative"
 whiteInitiativeID = "whiteInitiative"
 gmInitiativeID = "gm_roll_initiative"
 gmInitTextID = "text_button_2"
+turnOrderID = "h_scrollView"
+currentPlayerID = "text_button_3"
+nextPlayerID = "text_button_4"
+endTurnID = "end_turn_button"
+endTurnGmID = "end_turn_gm"
+endCombatID = "end_combat_gm"
+refreshCombatID = "refresh_combat_gm"
 
 -- Core functions:
 
@@ -60,11 +71,14 @@ BUTTON_COLOR_12 = "#bdbdbd"
 ATTRIBUTES = "attributes"
 ID = "id"
 CHILDREN = "children"
+CR_STRING = "CR " -- incorporate ( and ) too eventually
 
 -- Game variables:
 
 characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"} -- to remove!
 playerColorMap = {White = "", Red = "", Brown = "", Orange = "", Yellow = "", Green = "", Teal = "", Blue = "", Purple = "", Pink = ""}
+currentTurnName = ""
+nextTurnName = ""
 
 -- Network functions:
 
@@ -105,6 +119,23 @@ function displayPcs(pcList)
 end
 
 function displayTurnOrder()
+    -- broadcastToAll(initiativeList)
+    -- buildInitiativeRow(initiativeList)
+    getCurrentPlayer()
+    getNextPlayer()    
+
+    UI.setAttribute(endTurnGmID, "active", "true")
+    UI.setAttribute(endCombatID, "active", "true")
+    UI.setAttribute(refreshCombatID, "active", "true")
+end
+
+function endCombat()
+    UI.setAttribute(endTurnID, "active", "false")
+    UI.setAttribute(endTurnGmID, "active", "false")
+    UI.setAttribute(endCombatID, "active", "false")
+    UI.setAttribute(refreshCombatID, "active", "false")
+    UI.setAttribute(currentPlayerID, "active", "false")
+    UI.setAttribute(nextPlayerID, "active", "false")
 end
 
 function getElementByIdFromRoot(root, id)
@@ -140,23 +171,28 @@ function getElementById(xmlTable, id)
     return nil
 end
 
-function buildInitiativeRow()
+function buildInitiativeRow(fullInitiativeOrder)
+    UI.setAttribute(turnOrderID, "active", "true")
 
-local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+    local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
 
-broadcastToAll(gottenElement[ATTRIBUTES][ID])
+    broadcastToAll(gottenElement[ATTRIBUTES][ID])
     --we have to locate the xml element that will contain 
+    
+    -- now populate the xml:
 
-    for _, characterName in ipairs(characters) do
+
+    for _, characterName in ipairs(fullInitiativeOrder) do
         broadcastToAll(characterName)
     end
 end
 
 function requestInitiative()
+    endCombat()
     numberInitspopulated = 0
     initNameList = ""
     initListForDisplay = ""
-    initNamesJson = {}
+    initNamesJsonString = ""
     broadcastToAll("It\'s time to roll initiative!")
     -- for each color, if a PC, activate that UI element to request init
     if isNotEmpty(playerColorMap.White) then
@@ -236,30 +272,36 @@ function addPlayerInitiative(player, initTotal, id)
             end
         end
     end
-    print("player name: " .. playerName)
+    -- print("player name: " .. playerName)
     addNameToGMPopup(playerName, initTotal)
 end
 
 function addNameToGMPopup(pName, initiativeTotal)
-        -- add name to JSON list
-        initNameList = initNameList .. pName .. ":" .. initiativeTotal .. ", "
-        table.insert(initNamesJson, "\""..pName.."\":\""..initiativeTotal.."\"")
-        print("initNamesJson:")
-        for n=1, #(initNamesJson), 1 do
-            print(initNamesJson[n])
-        end
-        -- display list to GM
+        initNameList = initNameList..pName..":"..initiativeTotal..", "
         initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
+
         UI.setAttribute(gmInitTextID, "active", "true")
         UI.setAttribute(gmInitTextID, "text", initListForDisplay)
+
+        initNamesJsonString = initNamesJsonString.."\""..pName.."\":\""..initiativeTotal.."\", "
+        initNamesJsonStringToSend = "{" .. string.sub(initNamesJsonString, 1, string.len(initNamesJsonString)-2) .. "}"
+        -- print("initNamesJsonStringToSend: "..initNamesJsonStringToSend)
+
         UI.setAttribute(gmInitiativeID, "active", "true")
         UI.setAttribute(gmInitiativeID, "color", SELECTED_GREY)
 
         numberInitspopulated = numberInitspopulated + 1
-        -- when all populated, give the DM the roll button!
         if numberInitspopulated == numberOfPCs then
             UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
         end
+end
+
+function rollGmInitiative()
+    UI.setAttribute(gmInitTextID, "active", "false")
+    UI.setAttribute(gmInitiativeID, "active", "false")
+    -- broadcastToAll("Rolling npcs...")
+    apiRollInit()
+    UI.setAttribute(requestInitiativeID, "active", "true")
 end
 
 function playerSelected(player, name, id)
@@ -361,6 +403,70 @@ function closePcSelector()
     end
 end
 
+function announceTurn(currPlayer)
+    currPlayer = cutOutCRtext(currPlayer)
+    currentTurnName = currPlayer
+    broadcastToAll("It\'s your turn, "..currentTurnName.."!")
+    UI.setAttribute(currentPlayerID, "active", "true")
+    UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
+
+    UI.setAttribute(endTurnID, "active", "true")
+
+    if playerColorMap.White == currentTurnName then
+        UI.setAttribute(endTurnID, "visibility", "white")
+    else
+        if playerColorMap.Yellow == currentTurnName then
+            UI.setAttribute(endTurnID, "visibility", "yellow")
+        else
+            if playerColorMap.Orange == currentTurnName then
+                UI.setAttribute(endTurnID, "visibility", "orange")
+            else
+                if playerColorMap.Teal == currentTurnName then
+                    UI.setAttribute(endTurnID, "visibility", "teal")
+                else
+                    if playerColorMap.Brown == currentTurnName then
+                        UI.setAttribute(endTurnID, "visibility", "brown")
+                    else
+                        if playerColorMap.Pink == currentTurnName then
+                            UI.setAttribute(endTurnID, "visibility", "pink")
+                        else
+                            if playerColorMap.Purple == currentTurnName then
+                                UI.setAttribute(endTurnID, "visibility", "purple")
+                            else
+                                if playerColorMap.Green == currentTurnName then
+                                    UI.setAttribute(endTurnID, "visibility", "green")
+                                else
+                                    if playerColorMap.Blue == currentTurnName then
+                                        UI.setAttribute(endTurnID, "visibility", "blue")
+                                    else
+                                        if playerColorMap.Red == currentTurnName then
+                                            UI.setAttribute(endTurnID, "visibility", "red")
+                                        else
+                                            UI.setAttribute(endTurnID, "active", "false")
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function setNextTurn(nextPlayer)
+    nextPlayer = cutOutCRtext(nextPlayer)
+    nextTurnName = nextPlayer
+    UI.setAttribute(nextPlayerID, "active", "true")
+    UI.setAttribute(nextPlayerID, "text", "Next Turn: "..nextTurnName)
+end
+
+function announceTime(currRound)
+    print("The current round is: "..currRound)
+    displayTurnOrder() -- refresh!
+end
+
 -- API functions:
 
 function loadPlayerData()
@@ -374,7 +480,6 @@ function loadPlayerData()
             displayPcs(request.text);
         end
     end)
-    
 end
 
 function addToMap(name)
@@ -385,18 +490,76 @@ function addToMap(name)
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
-        else
+        -- else
             -- print(request.text);
         end
     end)
 end
 
-function rollGmInitiative()
-    UI.setAttribute(gmInitTextID, "active", "false")
-    UI.setAttribute(gmInitiativeID, "active", "false")
-    UI.setAttribute(requestInitiativeID, "active", "true")
+function apiRollInit()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ROLL_INITIATIVE_PATH
+    -- print("url: " .. url)
+    WebRequest.post(url, initNamesJsonStringToSend, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            displayTurnOrder();
+        end
+    end)
+end
 
+function apiGetInit()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_INITIATIVE_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            displayTurnOrder();
+        end
+    end)
+    
+end
 
+function getCurrentPlayer()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_CURRENT_PLAYER_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            announceTurn(request.text);
+        end
+    end)
+end
+
+function getNextPlayer()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_NEXT_PLAYER_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            setNextTurn(request.text);
+        end
+    end)
+end
+
+function endTurn()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. NEXT_TURN_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            announceTime(request.text);
+        end
+    end)
 end
 
 -- Utility functions:
@@ -420,6 +583,17 @@ function isNotEmpty(s)
     return s ~= nil and s ~= ''
 end
 
+function cutOutCRtext(str)
+    if str:find(CR_STRING) then
+        print("CR str: " .. str)
+        p, q = str:find(CR_STRING)
+        str = string.sub(str, 1, p-3) -- cut off the ( too
+        print(str)
+    end
+    
+    return str
+end
+
 -- User interface:
 
 -- 0) spawn in object / code for GUI from workshop
@@ -429,9 +603,13 @@ end
 -- 4) GM ONLY - 'request initiative' button. asks each player for their initiaitve total. 
 -- 5) Players - enter your initiative total (GM should already have your dex in the server in case of ties). 
 --   5.5) Once all player initiative totals are collected, GM can roll init (display what is entered to the GM).
--- 6) Display live turn order (updatable by the GM via the server)
+
+-- 6) Display turn order
 -- 7) On a player's turn, they can end their turn, advancing to the next player ('your turn' notification?).
 --   7.5) GM can end any turn.
 -- 8) GM can also refresh turn order
 
 -- future: add funtion to 'reveal' enemy attacks, weakneses or reactions!
+-- also display rounds past since initiative
+-- display / add timed effects?
+-- how to tie to object??
