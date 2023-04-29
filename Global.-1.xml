@@ -34,14 +34,17 @@
 <InputField id = "redInitiative" visibility = "red" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
 <InputField id = "yellowInitiative" visibility = "yellow" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
 <InputField id = "whiteInitiative" visibility = "white" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+</Panel>
+
+<Panel id = "gmInitPanel">
 <!-- GM initiative display & button -->
 <Button id = "text_button_2" visibility = "host" position = "0 -150 0" width = "400" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
-<Button id = "gm_roll_initiative" visibility = "host" position = "0 -200 0" width = "200" height = "50" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll initiative!</Button>
+<Button id = "gm_roll_initiative" visibility = "host" position = "0 -200 0" width = "200" height = "50" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
 </Panel>
 
 <Panel id = "thirdPanel">
 <!-- turn order -->
-<Button onClick = "buildInitiativeRow" width = "160" height = "30">Print Chars</Button>
+<!-- <Button onClick = "buildInitiativeRow" width = "160" height = "30">Print Chars</Button> -->
 
 <VerticalScrollView active = "false" width = "20%" height = "40%" rectAlignment = "UpperCenter" offsetXY = "0 -100" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout>
@@ -52,8 +55,8 @@
     </VerticalLayout>
 </VerticalScrollView>
 
-<HorizontalScrollView id = "h_scrollView" active = "true" width = "40%" height = "5%" rectAlignment = "UpperCenter" offsetXY = "0 -100" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
-    <HorizontalLayout id = "initiative_row">
+<HorizontalScrollView id = "h_scrollView" active = "false" width = "40%" height = "5%" rectAlignment = "UpperCenter" offsetXY = "0 -100" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <HorizontalLayout id = "initiative_row"> 
         <Panel id = "innerPanelLeft">
         <!-- remove the nested inner panel left this is just here for testing -->
             <Panel id = "nestedInnerPanelLeft"></Panel>

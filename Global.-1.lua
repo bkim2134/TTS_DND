@@ -7,6 +7,7 @@ IP_ADDRESS = nil
 PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
+ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
 GET_PCS_PATH = "/playermenu/getpcs"
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
 
@@ -104,7 +105,8 @@ function displayPcs(pcList)
     UI.setAttribute(pcListID, "active", "true")
 end
 
-function displayTurnOrder()
+function displayTurnOrder(initiativeList)
+    broadcastToAll(initiativeList)
 end
 
 function getElementByIdFromRoot(root, id)
@@ -156,7 +158,7 @@ function requestInitiative()
     numberInitspopulated = 0
     initNameList = ""
     initListForDisplay = ""
-    initNamesJson = {}
+    initNamesJsonString = ""
     broadcastToAll("It\'s time to roll initiative!")
     -- for each color, if a PC, activate that UI element to request init
     if isNotEmpty(playerColorMap.White) then
@@ -241,25 +243,31 @@ function addPlayerInitiative(player, initTotal, id)
 end
 
 function addNameToGMPopup(pName, initiativeTotal)
-        -- add name to JSON list
-        initNameList = initNameList .. pName .. ":" .. initiativeTotal .. ", "
-        table.insert(initNamesJson, "\""..pName.."\":\""..initiativeTotal.."\"")
-        print("initNamesJson:")
-        for n=1, #(initNamesJson), 1 do
-            print(initNamesJson[n])
-        end
-        -- display list to GM
+        initNameList = initNameList..pName..":"..initiativeTotal..", "
         initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
+
         UI.setAttribute(gmInitTextID, "active", "true")
         UI.setAttribute(gmInitTextID, "text", initListForDisplay)
+
+        initNamesJsonString = initNamesJsonString.."\""..pName.."\":\""..initiativeTotal.."\", "
+        initNamesJsonStringToSend = "{" .. string.sub(initNamesJsonString, 1, string.len(initNamesJsonString)-2) .. "}"
+        print("initNamesJsonStringToSend: "..initNamesJsonStringToSend)
+
         UI.setAttribute(gmInitiativeID, "active", "true")
         UI.setAttribute(gmInitiativeID, "color", SELECTED_GREY)
 
         numberInitspopulated = numberInitspopulated + 1
-        -- when all populated, give the DM the roll button!
         if numberInitspopulated == numberOfPCs then
             UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
         end
+end
+
+function rollGmInitiative()
+    UI.setAttribute(gmInitTextID, "active", "false")
+    UI.setAttribute(gmInitiativeID, "active", "false")
+    broadcastToAll("Rolling npcs...")
+    apiRollInit()
+    UI.setAttribute(requestInitiativeID, "active", "true")
 end
 
 function playerSelected(player, name, id)
@@ -300,7 +308,7 @@ function checkIfAllPCsSelected()
     if foundNames == numberOfPCs then -- close the PC selector
         closePcSelector()
         UI.setAttribute(requestInitiativeID, "active", "true")
-    end
+    end -- remove test comment
 end
 
 function closePcSelector()
@@ -385,18 +393,37 @@ function addToMap(name)
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
-        else
+        -- else
             -- print(request.text);
         end
     end)
 end
 
-function rollGmInitiative()
-    UI.setAttribute(gmInitTextID, "active", "false")
-    UI.setAttribute(gmInitiativeID, "active", "false")
-    UI.setAttribute(requestInitiativeID, "active", "true")
+function apiRollInit()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ROLL_INITIATIVE_PATH
+    -- print("url: " .. url)
+    WebRequest.post(url, initNamesJsonStringToSend, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            displayTurnOrder(request.text);
+        end
+    end)
+end
 
-
+function apiGetInit()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_INITIATIVE_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            displayTurnOrder(request.text);
+        end
+    end)
+    
 end
 
 -- Utility functions:
@@ -429,9 +456,11 @@ end
 -- 4) GM ONLY - 'request initiative' button. asks each player for their initiaitve total. 
 -- 5) Players - enter your initiative total (GM should already have your dex in the server in case of ties). 
 --   5.5) Once all player initiative totals are collected, GM can roll init (display what is entered to the GM).
--- 6) Display live turn order (updatable by the GM via the server)
+
+-- 6) Display turn order
 -- 7) On a player's turn, they can end their turn, advancing to the next player ('your turn' notification?).
 --   7.5) GM can end any turn.
 -- 8) GM can also refresh turn order
 
 -- future: add funtion to 'reveal' enemy attacks, weakneses or reactions!
+-- how to tie to object??
