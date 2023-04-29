@@ -248,10 +248,10 @@ function checkIfAllPCsSelected()
         
     end
 
-    -- if foundNames == numberOfPCs then -- close the PC selector
+    if foundNames == numberOfPCs then -- close the PC selector
         closePcSelector()
         UI.setAttribute(requestInitiativeID, "active", "true")
-    -- end UNCOMMENT HERE
+    end
 end
 
 function closePcSelector()
