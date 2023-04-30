@@ -1,6 +1,7 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
+
 -- Network constants:
 
 IP_ADDRESS = nil
@@ -14,7 +15,7 @@ NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
 GET_NEXT_PLAYER_PATH = "/playermenu/getnextcharacter"
 
--- XML ids:
+-- XML id constants:
 
 changeIPAddressID = "change_ipaddress"
 inputIPAddressID = "ipaddress_input"
@@ -40,16 +41,7 @@ endTurnID = "end_turn_button"
 endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
 refreshCombatID = "refresh_combat_gm"
-
--- Core functions:
-
-function onLoad()
-    --[[ print('onLoad!') --]]
-end
-
-function onUpdate()
-    --[[ print('onUpdate loop!') --]]
-end
+addAPlayerID = "addAPlayer"
 
 -- Game constants:
 
@@ -68,19 +60,32 @@ BUTTON_COLOR_9 = "#00ffcc"
 BUTTON_COLOR_10 = "#009933"
 BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
-ATTRIBUTES = "attributes"
-ID = "id"
-CHILDREN = "children"
-CR_STRING = "CR " -- incorporate ( and ) too eventually
+-- ATTRIBUTES = "attributes"
+-- ID = "id"
+-- CHILDREN = "children"
+CR_STRING = "CR "
 
 -- Game variables:
 
-characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"} -- to remove!
+pcList = {}
+numberOfPCs = 0
+-- characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"} -- todo: remove!
 playerColorMap = {White = "", Red = "", Brown = "", Orange = "", Yellow = "", Green = "", Teal = "", Blue = "", Purple = "", Pink = ""}
 currentTurnName = ""
 nextTurnName = ""
+pcSelectorActive = false
 
--- Network functions:
+-- Core functions:
+
+function onLoad()
+    --[[ print('onLoad!') --]]
+end
+
+function onUpdate()
+    --[[ print('onUpdate loop!') --]]
+end
+
+-- Network setup functions:
 
 function storeIPAddress(player, ipAddress, id)
     IP_ADDRESS = ipAddress
@@ -88,7 +93,7 @@ function storeIPAddress(player, ipAddress, id)
     UI.setAttribute(changeIPAddressID, "active", "true")
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
-    UI.setAttribute(changeIPAddressID, "text",IP_ADDRESS)
+    UI.setAttribute(changeIPAddressID, "text", IP_ADDRESS)
     loadPlayerData()
 end
 
@@ -98,16 +103,20 @@ function changeIPAddress()
     UI.setAttribute(changeIPAddressID, "active", "false")
 end
 
--- UI functions:
+-- Player selection functions:
 
-function displayPcs(pcList)
+function makePcList(pcListFromServer)
+    pcList = mysplit(shaveString(pcListFromServer), ",")
+    numberOfPCs = #(pcList)
+    displayPcs()
+    UI.setAttribute(addAPlayerID, "active", "true")
+end
+
+function displayPcs()
     -- for each PC, activate a button (max 10 PCs)
-    pcListList = mysplit(shaveString(pcList), ",")
-    numberOfPCs = #(pcListList)
-
     for i = 1, numberOfPCs, 1 do
-        -- print(pcListList[i])
-        name = shaveString(pcListList[i])
+        -- print(pcList[i])
+        name = shaveString(pcList[i])
         buttonId = "buttonId" .. tostring(i)
         UI.setAttribute(buttonId, "active", "true")
         UI.setAttribute(buttonId, "text", name)
@@ -116,203 +125,20 @@ function displayPcs(pcList)
 
     UI.setAttribute(textButtonID, "active", "true")
     UI.setAttribute(pcListID, "active", "true")
-end
-
-function displayTurnOrder()
-    -- broadcastToAll(initiativeList)
-    -- buildInitiativeRow(initiativeList)
-    getCurrentPlayer()
-    getNextPlayer()    
-
-    UI.setAttribute(endTurnGmID, "active", "true")
-    UI.setAttribute(endCombatID, "active", "true")
-    UI.setAttribute(refreshCombatID, "active", "true")
-end
-
-function endCombat()
-    UI.setAttribute(endTurnID, "active", "false")
-    UI.setAttribute(endTurnGmID, "active", "false")
-    UI.setAttribute(endCombatID, "active", "false")
-    UI.setAttribute(refreshCombatID, "active", "false")
-    UI.setAttribute(currentPlayerID, "active", "false")
-    UI.setAttribute(nextPlayerID, "active", "false")
-end
-
-function getElementByIdFromRoot(root, id)
-    for _,childTable in pairs(root) do
-        local table = childTable
-        local foundElement = getElementById(table, id)
-        if foundElement != nil then 
-            return foundElement
-        end
-    end
-    return nil
-end
-
-function getElementById(xmlTable, id)
-    local parentTable = xmlTable
-
-    if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
-        return parentTable
-
-    else
-            if type(parentTable[CHILDREN]) == "table" then
-                for _, childTable in pairs(parentTable[CHILDREN]) do
-                    parentTable = childTable
-                    local foundElement = getElementById(parentTable,id)
-                    if foundElement != nil then
-                        return foundElement
-                    end
-                end  
-            end
-
-    end
-
-    return nil
-end
-
-function buildInitiativeRow(fullInitiativeOrder)
-    UI.setAttribute(turnOrderID, "active", "true")
-
-    local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
-
-    broadcastToAll(gottenElement[ATTRIBUTES][ID])
-    --we have to locate the xml element that will contain 
-    
-    -- now populate the xml:
-
-
-    for _, characterName in ipairs(fullInitiativeOrder) do
-        broadcastToAll(characterName)
-    end
-end
-
-function requestInitiative()
-    endCombat()
-    numberInitspopulated = 0
-    initNameList = ""
-    initListForDisplay = ""
-    initNamesJsonString = ""
-    broadcastToAll("It\'s time to roll initiative!")
-    -- for each color, if a PC, activate that UI element to request init
-    if isNotEmpty(playerColorMap.White) then
-        UI.setAttribute(whiteInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Red) then
-        UI.setAttribute(redInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Orange) then
-        UI.setAttribute(orangeInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Brown) then
-        UI.setAttribute(brownInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Pink) then
-        UI.setAttribute(pinkInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Purple) then
-        UI.setAttribute(purpleInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Yellow) then
-        UI.setAttribute(yellowInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Blue) then
-        UI.setAttribute(blueInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Green) then
-        UI.setAttribute(greenInitiativeID, "active", "true")
-    end
-    if isNotEmpty(playerColorMap.Teal) then
-        UI.setAttribute(tealInitiativeID, "active", "true")
-    end
-    -- now hide the button
-    UI.setAttribute(requestInitiativeID, "active", "false")
-end
-
-function addPlayerInitiative(player, initTotal, id)
-    UI.setAttribute(id, "active", "false")
-    -- when entered, populates DM's init popup
-    -- find player name
-    if player.color == "Purple" then
-        playerName = playerColorMap.Purple
-    else
-        if player.color == "Red" then
-            playerName = playerColorMap.Red
-        else
-            if player.color == "Blue" then
-                playerName = playerColorMap.Blue
-            else
-                if player.color == "Orange" then
-                    playerName = playerColorMap.Orange
-                else
-                    if player.color == "Green" then
-                        playerName = playerColorMap.Green
-                    else
-                        if player.color == "Brown" then
-                            playerName = playerColorMap.Brown
-                        else
-                            if player.color == "Yellow" then
-                                playerName = playerColorMap.Yellow
-                            else
-                                if player.color == "Teal" then
-                                    playerName = playerColorMap.Teal
-                                else
-                                    if player.color == "White" then
-                                        playerName = playerColorMap.White
-                                    else
-                                        if player.color == "Pink" then
-                                            playerName = playerColorMap.Pink
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    -- print("player name: " .. playerName)
-    addNameToGMPopup(playerName, initTotal)
-end
-
-function addNameToGMPopup(pName, initiativeTotal)
-        initNameList = initNameList..pName..":"..initiativeTotal..", "
-        initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
-
-        UI.setAttribute(gmInitTextID, "active", "true")
-        UI.setAttribute(gmInitTextID, "text", initListForDisplay)
-
-        initNamesJsonString = initNamesJsonString.."\""..pName.."\":\""..initiativeTotal.."\", "
-        initNamesJsonStringToSend = "{" .. string.sub(initNamesJsonString, 1, string.len(initNamesJsonString)-2) .. "}"
-        -- print("initNamesJsonStringToSend: "..initNamesJsonStringToSend)
-
-        UI.setAttribute(gmInitiativeID, "active", "true")
-        UI.setAttribute(gmInitiativeID, "color", SELECTED_GREY)
-
-        numberInitspopulated = numberInitspopulated + 1
-        if numberInitspopulated == numberOfPCs then
-            UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
-        end
-end
-
-function rollGmInitiative()
-    UI.setAttribute(gmInitTextID, "active", "false")
-    UI.setAttribute(gmInitiativeID, "active", "false")
-    -- broadcastToAll("Rolling npcs...")
-    apiRollInit()
-    UI.setAttribute(requestInitiativeID, "active", "true")
+    pcSelectorActive = true
 end
 
 function playerSelected(player, name, id)
-    print(player.steam_name .. " (" .. player.color .. ") selected: " .. name)
     -- id is the buttonId
+    broadcastToAll(player.steam_name .. " (" .. player.color .. ") selected: " .. name)
 
     playerColorMap[tostring(player.color)] = name
-    UI.setAttribute(id, "color", SELECTED_GREY)
+    UI.setAttribute(id, "color", SELECTED_GREY) -- TODO - uncolor buttons too
 
     addToMap(name) -- API call, add character to map
 
+    UI.setAttribute(requestInitiativeID, "active", "true")
+    UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
     checkIfAllPCsSelected() -- close the PC selector if all are chosen
 end
 
@@ -320,28 +146,16 @@ function checkIfAllPCsSelected()
     -- for each PC, check if it is assigned to a color
     foundNames = 0
     for k = 1, numberOfPCs, 1 do
-        name = shaveString(pcListList[k])
+        name = shaveString(pcList[k])
         -- print(name)
-        -- print("White: " .. playerColorMap.White)
-        -- print("Blue: " .. playerColorMap.Blue)
-        -- print("Red: " .. playerColorMap.Red)
-        -- print("Orange: " .. playerColorMap.Orange)
-        -- print("Teal: " .. playerColorMap.Teal)
-        -- print("Pink: " .. playerColorMap.Pink)
-        -- print("Brown: " .. playerColorMap.Brown)
-        -- print("Yellow: " .. playerColorMap.Yellow)
-        -- print("Purple: " .. playerColorMap.Purple)
-        -- print("Green: " .. playerColorMap.Green)
-
-        if playerColorMap.White == name or playerColorMap.Red == name or playerColorMap.Brown == name or playerColorMap.Orange == name or playerColorMap.Yellow == name or playerColorMap.Green == name or playerColorMap.Teal == name or playerColorMap.Blue == name or playerColorMap.Purple == name or playerColorMap.Pink == name then
+        if isPlayerInColorMap(name) then
             foundNames = foundNames + 1 
         end
-        
     end
 
     if foundNames == numberOfPCs then -- close the PC selector
         closePcSelector()
-        UI.setAttribute(requestInitiativeID, "active", "true")
+        UI.setAttribute(requestInitiativeID, "color", DEFAULT_RED_PINK)
     end
 end
 
@@ -401,7 +215,99 @@ function closePcSelector()
         UI.setAttribute(buttonId, "color", setColor)
         UI.setAttribute(buttonId, "active", "false")
     end
+    pcSelectorActive = false
 end
+
+-- Initiative funtions:
+
+function requestInitiative()
+    endCombat()
+    if  pcSelectorActive then
+        closePcSelector()
+    end
+    numberInitspopulated = 0
+    initNameList = ""
+    initListForDisplay = ""
+    initNamesJsonString = ""
+    broadcastToAll("It\'s time to roll initiative!")
+    -- for each color, if a PC, activate that UI element to request init
+    if isNotEmpty(playerColorMap.White) then
+        UI.setAttribute(whiteInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Red) then
+        UI.setAttribute(redInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Orange) then
+        UI.setAttribute(orangeInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Brown) then
+        UI.setAttribute(brownInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Pink) then
+        UI.setAttribute(pinkInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Purple) then
+        UI.setAttribute(purpleInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Yellow) then
+        UI.setAttribute(yellowInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Blue) then
+        UI.setAttribute(blueInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Green) then
+        UI.setAttribute(greenInitiativeID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Teal) then
+        UI.setAttribute(tealInitiativeID, "active", "true")
+    end
+    -- now hide the button
+    UI.setAttribute(requestInitiativeID, "active", "false")
+end
+
+function addPlayerInitiative(player, initTotal, id)
+    UI.setAttribute(id, "active", "false")
+    addNameToGMPopup(findPlayerNameFromColor(player.color), initTotal)
+end
+
+function addNameToGMPopup(pName, initiativeTotal)
+        initNameList = initNameList..pName..":"..initiativeTotal..", "
+        initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
+
+        UI.setAttribute(gmInitTextID, "active", "true")
+        UI.setAttribute(gmInitTextID, "text", initListForDisplay)
+
+        initNamesJsonString = initNamesJsonString.."\""..pName.."\":\""..initiativeTotal.."\", "
+        initNamesJsonStringToSend = "{" .. string.sub(initNamesJsonString, 1, string.len(initNamesJsonString)-2) .. "}"
+        -- print("initNamesJsonStringToSend: "..initNamesJsonStringToSend)
+
+        UI.setAttribute(gmInitiativeID, "active", "true")
+        UI.setAttribute(gmInitiativeID, "color", SELECTED_GREY)
+
+        numberInitspopulated = numberInitspopulated + 1
+        if numberInitspopulated == numberOfPCs then
+            UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
+        end
+end
+
+function rollGmInitiative()
+    UI.setAttribute(gmInitTextID, "active", "false")
+    UI.setAttribute(gmInitiativeID, "active", "false")
+    -- broadcastToAll("Rolling npcs...")
+    apiRollInit()
+    UI.setAttribute(requestInitiativeID, "active", "true")
+end
+
+function endCombat()
+    UI.setAttribute(endTurnID, "active", "false")
+    UI.setAttribute(endTurnGmID, "active", "false")
+    UI.setAttribute(endCombatID, "active", "false")
+    UI.setAttribute(refreshCombatID, "active", "false")
+    UI.setAttribute(currentPlayerID, "active", "false")
+    UI.setAttribute(nextPlayerID, "active", "false")
+end
+
+-- Turn & time functions:
 
 function announceTurn(currPlayer)
     currPlayer = cutOutCRtext(currPlayer)
@@ -409,8 +315,6 @@ function announceTurn(currPlayer)
     broadcastToAll("It\'s your turn, "..currentTurnName.."!")
     UI.setAttribute(currentPlayerID, "active", "true")
     UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
-
-    UI.setAttribute(endTurnID, "active", "true")
 
     if playerColorMap.White == currentTurnName then
         UI.setAttribute(endTurnID, "visibility", "white")
@@ -453,6 +357,7 @@ function announceTurn(currPlayer)
             end
         end
     end
+    UI.setAttribute(endTurnID, "active", "true")
 end
 
 function setNextTurn(nextPlayer)
@@ -467,6 +372,17 @@ function announceTime(currRound)
     displayTurnOrder() -- refresh!
 end
 
+function displayTurnOrder()
+    -- broadcastToAll(initiativeList)
+    -- buildInitiativeRow(initiativeList)
+    getCurrentPlayer()
+    getNextPlayer()    
+
+    UI.setAttribute(endTurnGmID, "active", "true")
+    UI.setAttribute(endCombatID, "active", "true")
+    UI.setAttribute(refreshCombatID, "active", "true")
+end
+
 -- API functions:
 
 function loadPlayerData()
@@ -477,7 +393,7 @@ function loadPlayerData()
             print("error: " .. request.error)
             log(request.error)
         else
-            displayPcs(request.text);
+            makePcList(request.text);
         end
     end)
 end
@@ -549,7 +465,7 @@ function getNextPlayer()
     end)
 end
 
-function endTurn()
+function apiEndTurn()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. NEXT_TURN_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
@@ -563,6 +479,56 @@ function endTurn()
 end
 
 -- Utility functions:
+
+function findPlayerNameFromColor(playerColor)
+    -- find player name
+    if playerColor == "Purple" then
+        playerName = playerColorMap.Purple
+    else
+        if playerColor == "Red" then
+            playerName = playerColorMap.Red
+        else
+            if playerColor == "Blue" then
+                playerName = playerColorMap.Blue
+            else
+                if playerColor == "Orange" then
+                    playerName = playerColorMap.Orange
+                else
+                    if playerColor == "Green" then
+                        playerName = playerColorMap.Green
+                    else
+                        if playerColor == "Brown" then
+                            playerName = playerColorMap.Brown
+                        else
+                            if playerColor == "Yellow" then
+                                playerName = playerColorMap.Yellow
+                            else
+                                if playerColor == "Teal" then
+                                    playerName = playerColorMap.Teal
+                                else
+                                    if playerColor == "White" then
+                                        playerName = playerColorMap.White
+                                    else
+                                        if playerColor == "Pink" then
+                                            playerName = playerColorMap.Pink
+                                        else
+                                            playerName = "No name found for color "..playerColor
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    -- print("player name: " .. playerName)
+end
+
+function isPlayerInColorMap(potentialPlayerName)
+    return playerColorMap.White == potentialPlayerName or playerColorMap.Red == potentialPlayerName or playerColorMap.Brown == potentialPlayerName or playerColorMap.Orange == potentialPlayerName or playerColorMap.Yellow == potentialPlayerName or playerColorMap.Green == potentialPlayerName or playerColorMap.Teal == potentialPlayerName or playerColorMap.Blue == potentialPlayerName or playerColorMap.Purple == potentialPlayerName or playerColorMap.Pink == potentialPlayerName
+end
 
 function shaveString(inputstr)
     return string.sub(inputstr, 2, string.len(inputstr)-1)
@@ -603,13 +569,61 @@ end
 -- 4) GM ONLY - 'request initiative' button. asks each player for their initiaitve total. 
 -- 5) Players - enter your initiative total (GM should already have your dex in the server in case of ties). 
 --   5.5) Once all player initiative totals are collected, GM can roll init (display what is entered to the GM).
-
 -- 6) Display turn order
 -- 7) On a player's turn, they can end their turn, advancing to the next player ('your turn' notification?).
 --   7.5) GM can end any turn.
 -- 8) GM can also refresh turn order
 
 -- future: add funtion to 'reveal' enemy attacks, weakneses or reactions!
--- also display rounds past since initiative
--- display / add timed effects?
--- how to tie to object??
+
+
+-- Recursive XML functions:
+
+-- function getElementByIdFromRoot(root, id)
+--     for _,childTable in pairs(root) do
+--         local table = childTable
+--         local foundElement = getElementById(table, id)
+--         if foundElement != nil then 
+--             return foundElement
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
