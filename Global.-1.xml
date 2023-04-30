@@ -1,6 +1,6 @@
 <Panel id = "ipSelectorPanel" position = "590 516 0">
-    <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "storeIPAddress"  placeholder = "Input server address:"></InputField>
-    <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="changeIPAddress" width = "160" height = "30">Change server address</Button>
+    <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "storeIPAddress"  placeholder = "Input server address:" allowDragging = "true" returnToOriginalPositionWhenReleased = "false"></InputField>
+    <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="changeIPAddress" width = "160" height = "30" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Change server address</Button>
 </Panel>
 
 <Panel id = "playerSelectorPanel">
@@ -19,7 +19,8 @@
         <Button id = "buttonId11" onClick = "playerSelected(Button Eleven)" color = "#ebebeb" fontStyle = "bold" fontSize = "16px" active = "false">Button Eleven</Button>
         <Button id = "buttonId12" onClick = "playerSelected(Button Twelve)" color = "#bdbdbd" fontStyle = "bold" fontSize = "16px" active = "false">Button Twelve</Button>
     </GridLayout>
-    <Button id = "addAPlayer" visibility = "host" color = "#ff6666" onClick="displayPcs" position = "590 500 0" width = "160" height = "30" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false">Add a player</Button>
+    <Button id = "addAPlayer" visibility = "host" color = "#3498DB" onClick="displayPcs" position = "870 250 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Open Player Selector</Button>
+    <Button id = "closePlayerSelector" visibility = "host" color = "#cc0000" onClick="closePcSelector" position = "870 210 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Player Selector</Button>
 </Panel>
 
 <Panel id = "initiativePanel">
@@ -37,8 +38,8 @@
 </Panel>
 
 <Panel id = "gmInitPanel">
-    <Button id = "text_button_2" visibility = "host" position = "0 -150 0" width = "400" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
-    <Button id = "gm_roll_initiative" visibility = "host" position = "0 -200 0" width = "200" height = "50" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
+    <Button id = "text_button_2" visibility = "host" position = "650 -430 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
+    <Button id = "gm_roll_initiative" visibility = "host" position = "655 -500 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
 </Panel>
 
 <Panel id = "turnPanel">

@@ -42,10 +42,13 @@ endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
 refreshCombatID = "refresh_combat_gm"
 addAPlayerID = "addAPlayer"
+closePlayerSelectorID = "closePlayerSelector"
 
 -- Game constants:
 
 SELECTED_GREY = "#787878"
+PROMPT_BLUE = "#3498DB"
+NPC_PURPLE = "#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULTY_GREY = "#d1d1d1"
 BUTTON_COLOR_1 = "#99ccff"
@@ -110,6 +113,7 @@ function makePcList(pcListFromServer)
     numberOfPCs = #(pcList)
     displayPcs()
     UI.setAttribute(addAPlayerID, "active", "true")
+    UI.setAttribute(closePlayerSelectorID, "active", "true")
 end
 
 function displayPcs()
@@ -130,75 +134,68 @@ end
 
 function playerSelected(player, name, id)
     -- id is the buttonId
-    broadcastToAll(player.steam_name .. " (" .. player.color .. ") selected: " .. name)
+    playerCurrentName = findPlayerNameFromColor(player.color)
+    if playerCurrentName == name then
+        broadcastToColor("You've already selected "..name, player.color)
+    else
+        broadcastToAll(player.steam_name .. " (" .. player.color .. ") selected: " .. name)
+        playerColorMap[tostring(player.color)] = name
+        updatePlayerButtons()
+        addToMap(name) -- API call, add character to map
 
-    playerColorMap[tostring(player.color)] = name
-    UI.setAttribute(id, "color", SELECTED_GREY) -- TODO - uncolor buttons too
-
-    addToMap(name) -- API call, add character to map
-
-    UI.setAttribute(requestInitiativeID, "active", "true")
-    UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
-    checkIfAllPCsSelected() -- close the PC selector if all are chosen
-end
-
-function checkIfAllPCsSelected()
-    -- for each PC, check if it is assigned to a color
-    foundNames = 0
-    for k = 1, numberOfPCs, 1 do
-        name = shaveString(pcList[k])
-        -- print(name)
-        if isPlayerInColorMap(name) then
-            foundNames = foundNames + 1 
-        end
-    end
-
-    if foundNames == numberOfPCs then -- close the PC selector
-        closePcSelector()
-        UI.setAttribute(requestInitiativeID, "color", DEFAULT_RED_PINK)
+        UI.setAttribute(requestInitiativeID, "active", "true")
+        UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        checkIfAllPCsSelected() -- close the PC selector if all are chosen
     end
 end
 
-function closePcSelector()
-    UI.setAttribute(textButtonID, "active", "false")
-    UI.setAttribute(pcListID, "active", "false")
+function updatePlayerButtons()
+    -- set any selected buttons to SELECTED_GREY, all others to default
     for m = 1, 12, 1 do -- set buttons to inactive & reset color
+        buttonId = "buttonId" .. tostring(m)
+        playerName02 = UI.getAttribute(buttonId, "text")
+        print(playerName02)
         setColor = DEFAULT_RED_PINK
-        if m == 1 then
-            setColor = BUTTON_COLOR_1
-        else 
-            if m == 2 then
-                setColor = BUTTON_COLOR_2
-            else
-                if m == 3 then
-                    setColor = BUTTON_COLOR_3
+
+        if isPlayerInColorMap(playerName02) then
+            setColor = SELECTED_GREY
+        else
+            if m == 1 then
+                setColor = BUTTON_COLOR_1
+            else 
+                if m == 2 then
+                    setColor = BUTTON_COLOR_2
                 else
-                    if m == 4 then
-                        setColor = BUTTON_COLOR_4
+                    if m == 3 then
+                        setColor = BUTTON_COLOR_3
                     else
-                        if m == 5 then
-                            setColor = BUTTON_COLOR_5
+                        if m == 4 then
+                            setColor = BUTTON_COLOR_4
                         else
-                            if m == 6 then
-                                setColor = BUTTON_COLOR_6
+                            if m == 5 then
+                                setColor = BUTTON_COLOR_5
                             else
-                                if m == 7 then
-                                    setColor = BUTTON_COLOR_7
+                                if m == 6 then
+                                    setColor = BUTTON_COLOR_6
                                 else
-                                    if m == 8 then
-                                        setColor = BUTTON_COLOR_8
+                                    if m == 7 then
+                                        setColor = BUTTON_COLOR_7
                                     else
-                                        if m == 9 then
-                                            setColor = BUTTON_COLOR_9
+                                        if m == 8 then
+                                            setColor = BUTTON_COLOR_8
                                         else
-                                            if m == 10 then
-                                                setColor = BUTTON_COLOR_10
+                                            if m == 9 then
+                                                setColor = BUTTON_COLOR_9
                                             else
-                                                if m == 11 then
-                                                    setColor = BUTTON_COLOR_11
+                                                if m == 10 then
+                                                    setColor = BUTTON_COLOR_10
                                                 else
-                                                    if m == 12 then
-                                                        setColor = BUTTON_COLOR_12
+                                                    if m == 11 then
+                                                        setColor = BUTTON_COLOR_11
+                                                    else
+                                                        if m == 12 then
+                                                            setColor = BUTTON_COLOR_12
+                                                        end
                                                     end
                                                 end
                                             end
@@ -211,10 +208,32 @@ function closePcSelector()
                 end
             end
         end
-        buttonId = "buttonId" .. tostring(m)
+
         UI.setAttribute(buttonId, "color", setColor)
-        UI.setAttribute(buttonId, "active", "false")
     end
+end
+
+function checkIfAllPCsSelected()
+    -- for each PC, check if it is assigned to a color
+    foundNames = 0
+    for k = 1, numberOfPCs, 1 do
+        name = shaveString(pcList[k])
+        print(name)
+        if isPlayerInColorMap(name) then
+            foundNames = foundNames + 1 
+        end
+    end
+
+    print(foundNames)
+    if foundNames == numberOfPCs then -- close the PC selector
+        closePcSelector()
+        UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
+    end
+end
+
+function closePcSelector()
+    UI.setAttribute(textButtonID, "active", "false")
+    UI.setAttribute(pcListID, "active", "false")
     pcSelectorActive = false
 end
 
@@ -261,13 +280,15 @@ function requestInitiative()
     if isNotEmpty(playerColorMap.Teal) then
         UI.setAttribute(tealInitiativeID, "active", "true")
     end
-    -- now hide the button
-    UI.setAttribute(requestInitiativeID, "active", "false")
+    UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
 end
 
 function addPlayerInitiative(player, initTotal, id)
     UI.setAttribute(id, "active", "false")
-    addNameToGMPopup(findPlayerNameFromColor(player.color), initTotal)
+    -- print(initTotal)
+    name01 = findPlayerNameFromColor(player.color)
+    -- print(name01)
+    addNameToGMPopup(name01, initTotal)
 end
 
 function addNameToGMPopup(pName, initiativeTotal)
@@ -286,7 +307,7 @@ function addNameToGMPopup(pName, initiativeTotal)
 
         numberInitspopulated = numberInitspopulated + 1
         if numberInitspopulated == numberOfPCs then
-            UI.setAttribute(gmInitiativeID, "color", DEFAULT_RED_PINK)
+            UI.setAttribute(gmInitiativeID, "color", PROMPT_BLUE)
         end
 end
 
@@ -295,7 +316,7 @@ function rollGmInitiative()
     UI.setAttribute(gmInitiativeID, "active", "false")
     -- broadcastToAll("Rolling npcs...")
     apiRollInit()
-    UI.setAttribute(requestInitiativeID, "active", "true")
+    UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
 end
 
 function endCombat()
@@ -310,7 +331,12 @@ end
 -- Turn & time functions:
 
 function announceTurn(currPlayer)
-    currPlayer = cutOutCRtext(currPlayer)
+    if isCharacterNpc(currPlayer) then
+        currPlayer = cutOutCRtext(currPlayer)
+        UI.setAttribute(endTurnGmID, "color", NPC_PURPLE)
+    else
+        UI.setAttribute(endTurnGmID, "color", DEFAULT_RED_PINK)
+    end
     currentTurnName = currPlayer
     broadcastToAll("It\'s your turn, "..currentTurnName.."!")
     UI.setAttribute(currentPlayerID, "active", "true")
@@ -368,7 +394,7 @@ function setNextTurn(nextPlayer)
 end
 
 function announceTime(currRound)
-    print("The current round is: "..currRound)
+    print("The current time is: "..currRound)
     displayTurnOrder() -- refresh!
 end
 
@@ -524,6 +550,7 @@ function findPlayerNameFromColor(playerColor)
         end
     end
     -- print("player name: " .. playerName)
+    return playerName
 end
 
 function isPlayerInColorMap(potentialPlayerName)
@@ -549,14 +576,21 @@ function isNotEmpty(s)
     return s ~= nil and s ~= ''
 end
 
+function isCharacterNpc(str)
+    if str:find(CR_STRING) then
+        return true
+    else
+        return false
+    end
+end
+
 function cutOutCRtext(str)
     if str:find(CR_STRING) then
-        print("CR str: " .. str)
+        -- print("CR str: " .. str)
         p, q = str:find(CR_STRING)
         str = string.sub(str, 1, p-3) -- cut off the ( too
-        print(str)
+        -- print(str)
     end
-    
     return str
 end
 
