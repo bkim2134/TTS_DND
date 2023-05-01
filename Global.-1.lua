@@ -75,10 +75,11 @@ BUTTON_COLOR_9 = "#00ffcc"
 BUTTON_COLOR_10 = "#009933"
 BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
+CR_STRING = [[%pCR%s]]
+CR_STRING_2 = [[%p%d]]
 -- ATTRIBUTES = "attributes"
 -- ID = "id"
 -- CHILDREN = "children"
-CR_STRING = "CR "
 
 -- Game variables:
 
@@ -518,7 +519,9 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    nextPlayer = cutOutCRtext(nextPlayer)
+    if isCharacterNpc(nextPlayer) then
+        nextPlayer = cutOutCRtext(nextPlayer)
+    end
     nextTurnName = nextPlayer
     UI.setAttribute(nextPlayerID, "active", "true")
     UI.setAttribute(nextPlayerID, "text", "Next Turn: "..nextTurnName)
@@ -714,12 +717,17 @@ function isCharacterNpc(str)
 end
 
 function cutOutCRtext(str)
-    if str:find(CR_STRING) then
-        -- print("CR str: " .. str)
-        p, q = str:find(CR_STRING)
-        str = string.sub(str, 1, p-3) -- cut off the ( too
-        -- print(str)
+    -- print("CR str: " .. CR_STRING..", name: "..str)
+    p, q = str:find(CR_STRING)
+    r, s = str:find(CR_STRING_2)
+    if r ~= nil then -- numbered npc, add the number
+        local stringA = string.sub(str, 1, p-1)
+        local stringB = string.sub(str, r+1, string.len(str))
+        str = stringA..stringB
+    else -- un-numbered npc
+        str = string.sub(str, 1, p-2) -- cut off the space too
     end
+    -- print("non CR str: "..str)
     return str
 end
 
