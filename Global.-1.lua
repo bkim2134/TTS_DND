@@ -342,6 +342,7 @@ function announceTurn(currPlayer)
     UI.setAttribute(currentPlayerID, "active", "true")
     UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
 
+    noMatch = false
     if playerColorMap.White == currentTurnName then
         UI.setAttribute(endTurnID, "visibility", "white")
     else
@@ -372,7 +373,7 @@ function announceTurn(currPlayer)
                                         if playerColorMap.Red == currentTurnName then
                                             UI.setAttribute(endTurnID, "visibility", "red")
                                         else
-                                            UI.setAttribute(endTurnID, "active", "false")
+                                            noMatch = true
                                         end
                                     end
                                 end
@@ -383,7 +384,11 @@ function announceTurn(currPlayer)
             end
         end
     end
-    UI.setAttribute(endTurnID, "active", "true")
+    if noMatch then
+        UI.setAttribute(endTurnID, "active", "false")
+    else
+        UI.setAttribute(endTurnID, "active", "true")
+    end
 end
 
 function setNextTurn(nextPlayer)
