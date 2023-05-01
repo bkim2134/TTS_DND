@@ -42,7 +42,19 @@ endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
 refreshCombatID = "refresh_combat_gm"
 addAPlayerID = "addAPlayer"
-closePlayerSelectorID = "closePlayerSelector"
+requestSkillID = "requestPartySkill"
+whiteSkillID = "whiteSkill"
+blueSkillID = "blueSkill"
+greenSkillID = "greenSkill"
+yellowSkillID = "yellowSkill"
+purpleSkillID = "purpleSkill"
+redSkillID = "redSkill"
+orangeSkillID = "orangeSkill"
+tealSkillID = "tealSkill"
+pinkSkillID = "pinkSkill"
+brownSkillID = "brownSkill"
+skillTextID = "text_button_5"
+openPartySkillViewerID = "openPartySkillViewer"
 
 -- Game constants:
 
@@ -112,7 +124,19 @@ function makePcList(pcListFromServer)
     numberOfPCs = #(pcList)
     displayPcs()
     UI.setAttribute(addAPlayerID, "active", "true")
-    UI.setAttribute(closePlayerSelectorID, "active", "true")
+end
+
+function addPlayerToggle()
+    if UI.getAttribute(addAPlayerID, "text") == "Open Player Selector" then
+        UI.setAttribute(addAPlayerID, "text", "Close Player Selector")
+        UI.setAttribute(addAPlayerID, "color", BUTTON_COLOR_6)
+        displayPcs()
+    else
+        UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
+        UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE)
+        closePcSelector()
+
+    end
 end
 
 function displayPcs()
@@ -143,6 +167,8 @@ function playerSelected(player, name, id)
         apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        UI.setAttribute(requestSkillID, "active", "true")
+        UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
         checkIfAllPCsSelected()
     end
 end
@@ -223,8 +249,9 @@ function checkIfAllPCsSelected()
     end
     -- print(foundNames)
     if foundNames == numberOfPCs then
-        closePcSelector()
+        addPlayerToggle()
         UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
+        UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
     end
 end
 
@@ -322,6 +349,109 @@ function endCombat()
     UI.setAttribute(refreshCombatID, "active", "false")
     UI.setAttribute(currentPlayerID, "active", "false")
     UI.setAttribute(nextPlayerID, "active", "false")
+end
+
+-- Party skill check functions:()
+
+function requestPartySkillCheck()
+    if  pcSelectorActive then
+        closePcSelector()
+    end
+    skillNameList = ""
+    statsString = ""
+    statsList = {}
+    broadcastToAll("It\'s time for a skill check!")
+    -- for each color, if a PC, activate that UI element to request skill
+    if isNotEmpty(playerColorMap.White) then
+        UI.setAttribute(whiteSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Red) then
+        UI.setAttribute(redSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Orange) then
+        UI.setAttribute(orangeSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Brown) then
+        UI.setAttribute(brownSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Pink) then
+        UI.setAttribute(pinkSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Purple) then
+        UI.setAttribute(purpleSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Yellow) then
+        UI.setAttribute(yellowSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Blue) then
+        UI.setAttribute(blueSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Green) then
+        UI.setAttribute(greenSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Teal) then
+        UI.setAttribute(tealSkillID, "active", "true")
+    end
+    UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
+end
+
+function addPlayerSkill(player, skillTotal, id)
+    UI.setAttribute(id, "active", "false")
+    name03 = findPlayerNameFromColor(player.color)
+    -- print(name03)
+    addNameToPartySkillPopup(name03, skillTotal)
+end
+
+function addNameToPartySkillPopup(skillName, skillTotal)
+    skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
+    table.insert(statsList,tonumber(skillTotal))
+    UI.setAttribute(skillTextID, "text", "Party Results:\n"..skillNameList.."\nStatistics:\n["..getSkillStatistics().."]")
+    UI.setAttribute(skillTextID, "active", "true")
+
+    UI.setAttribute(openPartySkillViewerID, "active", "true")
+end
+
+function getSkillStatistics()
+    
+    -- get the total, mean, & median
+    local sum = 0
+    for _,number in pairs(statsList) do
+        print("number: "..tostring(number))
+        sum = sum + number
+    end
+
+    if #statsList < 2 then
+        return "Total: "..tostring(sum)
+    end
+
+    local mean = sum / #(statsList)
+
+    table.sort(statsList)
+    local mid = #statsList/2
+    local median = 0
+    print("mid: "..tostring(mid))
+    if math.floor(mid)==mid then
+        median = nums[mid]
+    else
+        median = (statsList[math.floor(mid)]+statsList[math.ceil(mid)])/2
+    end
+
+    statsString = "Total: "..tostring(sum)..", Average: "..tostring(mean)..", Middle: "..tostring(median)
+    return statsString
+end
+
+function skillPopupToggle()
+    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Skill Viewer" then
+        UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
+        UI.setAttribute(skillTextID, "active", "true")
+        UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
+    else
+        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "color", PROMPT_BLUE)
+        UI.setAttribute(skillTextID, "active", "false")
+        UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
+    end
 end
 
 -- Turn & time functions:
