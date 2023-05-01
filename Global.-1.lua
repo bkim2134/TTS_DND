@@ -82,6 +82,7 @@ pcSelectorActive = false
 
 function onLoad()
     --[[ print('onLoad!') --]]
+    broadcastToAll("Loading the D&D Combat Assistant...")
 end
 
 function onUpdate()
