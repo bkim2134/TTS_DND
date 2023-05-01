@@ -2,6 +2,14 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
+-- XML variables: 
+
+isTabletopObject = false -- set to true for objects
+XML_STRING = [[
+<XML id = "test" onCLick = "guidPlaceholder/foo">
+<XML>
+]]
+
 -- Network constants:
 
 IP_ADDRESS = nil
@@ -94,6 +102,9 @@ pcSelectorActive = false
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function onUpdate()
@@ -148,7 +159,12 @@ function displayPcs()
         buttonId = "buttonId" .. tostring(i)
         UI.setAttribute(buttonId, "active", "true")
         UI.setAttribute(buttonId, "text", name)
-        UI.setAttribute(buttonId, "onClick", "playerSelected("..name..")")
+        if isTabletopObject then
+            UI.setAttribute(buttonId, "onClick", objectGuid.."/playerSelected("..name..")")
+        else
+            UI.setAttribute(buttonId, "onClick", "playerSelected("..name..")")
+        end
+        
     end
 
     UI.setAttribute(textButtonID, "active", "true")
@@ -729,6 +745,22 @@ function cutOutCRtext(str)
     end
     -- print("non CR str: "..str)
     return str
+end
+
+-- Object XML Utility functions:
+
+function setupObjectXmlUI()
+    objectGuid = "guid1234"-- getGUID()
+    local newXML = replaceXmlGuid(XML_STRING, objectGuid)
+    UI.setXml(newXML)
+end
+
+function replaceXmlGuid(xml, guid)
+    print("XML: "..xml)
+    print("GUID: "..guid)
+    xml = xml:gsub("guidPlaceholder", guid)
+    print("New XML: "..xml)
+    return xml
 end
 
 

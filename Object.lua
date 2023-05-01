@@ -1,7 +1,8 @@
 -- Object.lua: 
--- 0) Follow the steps in Object.xml.
--- 1) Add 'UI.setXml(XML_STRING)' to the onLoad() function.
--- 2) Add 'c8645d/' to the button onClick attributes in the displayPcs() function.
+-- 1) Follow the steps in Object.xml.
+-- 2) Set 'isTabletopObject' to true.
+
+-- In tabletop:
 -- 3) Copy the code below into the object's lua in the scripting editor.
 -- 4) Save the object. I like to name it 'D&D Combat Assistant engine'.
 -- 5) When you load in the object, it will load the D&D Combat Assistant.
@@ -11,61 +12,77 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
--- XML constant: 
+-- XML variables: 
 
+isTabletopObject = true -- set to true for objects
 XML_STRING = [[
-<Panel id = "superPanel">
+    <Panel id = "superPanel">
     <Panel id = "ipSelectorPanel" position = "590 516 0">
-        <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "c8645d/storeIPAddress"  placeholder = "Input server address:" allowDragging = "true" returnToOriginalPositionWhenReleased = "false"></InputField>
-        <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="c8645d/changeIPAddress" width = "160" height = "30" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Change server address</Button>
+        <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "guidPlaceholder/storeIPAddress"  placeholder = "Input server address:" allowDragging = "true" returnToOriginalPositionWhenReleased = "false"></InputField>
+        <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="guidPlaceholder/changeIPAddress" width = "160" height = "30" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Change server address</Button>
     </Panel>
 
     <Panel id = "playerSelectorPanel">
         <Button id = "text_button" position = "0 330 0" width = "700" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
         <GridLayout id = "pc_list" childAlignment = "upperCenter" padding = "250 250 250 250" spacing = "20 10" cellSize = "300 75" active = "false">
-            <Button id = "buttonId1" onClick = "c8645d/playerSelected(Button One)" color = "#99ccff" fontStyle = "bold" fontSize = "16px" active = "false">Button One</Button>
-            <Button id = "buttonId2" onClick = "c8645d/playerSelected(Button Two)" color = "#3399ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Two</Button>
-            <Button id = "buttonId3" onClick = "c8645d/playerSelected(Button Three)" color = "#ff99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Three</Button>
-            <Button id = "buttonId4" onClick = "c8645d/playerSelected(Button Four)" color = "#cc99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Four</Button>
-            <Button id = "buttonId5" onClick = "c8645d/playerSelected(Button Five)" color = "#ff0066" fontStyle = "bold" fontSize = "16px" active = "false">Button Five</Button>
-            <Button id = "buttonId6" onClick = "c8645d/playerSelected(Button Six)" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false">Button Six</Button>
-            <Button id = "buttonId7" onClick = "c8645d/playerSelected(Button Seven)" color = "#ffcc99" fontStyle = "bold" fontSize = "16px" active = "false">Button Seven</Button>
-            <Button id = "buttonId8" onClick = "c8645d/playerSelected(Button Eight)" color = "#e48b07" fontStyle = "bold" fontSize = "16px" active = "false">Button Eight</Button>
-            <Button id = "buttonId9" onClick = "c8645d/playerSelected(Button Nine)" color = "#00ffcc" fontStyle = "bold" fontSize = "16px" active = "false">Button Nine</Button>
-            <Button id = "buttonId10" onClick = "c8645d/playerSelected(Button Ten)" color = "#009933" fontStyle = "bold" fontSize = "16px" active = "false">Button Ten</Button>
-            <Button id = "buttonId11" onClick = "c8645d/playerSelected(Button Eleven)" color = "#ebebeb" fontStyle = "bold" fontSize = "16px" active = "false">Button Eleven</Button>
-            <Button id = "buttonId12" onClick = "c8645d/playerSelected(Button Twelve)" color = "#bdbdbd" fontStyle = "bold" fontSize = "16px" active = "false">Button Twelve</Button>
+            <Button id = "buttonId1" onClick = "guidPlaceholder/playerSelected(Button One)" color = "#99ccff" fontStyle = "bold" fontSize = "16px" active = "false">Button One</Button>
+            <Button id = "buttonId2" onClick = "guidPlaceholder/playerSelected(Button Two)" color = "#3399ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Two</Button>
+            <Button id = "buttonId3" onClick = "guidPlaceholder/playerSelected(Button Three)" color = "#ff99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Three</Button>
+            <Button id = "buttonId4" onClick = "guidPlaceholder/playerSelected(Button Four)" color = "#cc99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Four</Button>
+            <Button id = "buttonId5" onClick = "guidPlaceholder/playerSelected(Button Five)" color = "#ff0066" fontStyle = "bold" fontSize = "16px" active = "false">Button Five</Button>
+            <Button id = "buttonId6" onClick = "guidPlaceholder/playerSelected(Button Six)" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false">Button Six</Button>
+            <Button id = "buttonId7" onClick = "guidPlaceholder/playerSelected(Button Seven)" color = "#ffcc99" fontStyle = "bold" fontSize = "16px" active = "false">Button Seven</Button>
+            <Button id = "buttonId8" onClick = "guidPlaceholder/playerSelected(Button Eight)" color = "#e48b07" fontStyle = "bold" fontSize = "16px" active = "false">Button Eight</Button>
+            <Button id = "buttonId9" onClick = "guidPlaceholder/playerSelected(Button Nine)" color = "#00ffcc" fontStyle = "bold" fontSize = "16px" active = "false">Button Nine</Button>
+            <Button id = "buttonId10" onClick = "guidPlaceholder/playerSelected(Button Ten)" color = "#009933" fontStyle = "bold" fontSize = "16px" active = "false">Button Ten</Button>
+            <Button id = "buttonId11" onClick = "guidPlaceholder/playerSelected(Button Eleven)" color = "#ebebeb" fontStyle = "bold" fontSize = "16px" active = "false">Button Eleven</Button>
+            <Button id = "buttonId12" onClick = "guidPlaceholder/playerSelected(Button Twelve)" color = "#bdbdbd" fontStyle = "bold" fontSize = "16px" active = "false">Button Twelve</Button>
         </GridLayout>
-        <Button id = "addAPlayer" visibility = "host" color = "#3498DB" onClick="c8645d/displayPcs" position = "870 250 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Open Player Selector</Button>
-        <Button id = "closePlayerSelector" visibility = "host" color = "#cc0000" onClick="c8645d/closePcSelector" position = "870 210 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Player Selector</Button>
+        <Button id = "addAPlayer" visibility = "host" color = "#cc0000" onClick="guidPlaceholder/addPlayerToggle" position = "590 480 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Player Selector</Button>
     </Panel>
 
     <Panel id = "initiativePanel">
-        <Button id = "requestInit" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="c8645d/requestInitiative" position = "850 150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
-        <InputField id = "blueInitiative" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "c8645d/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "purpleInitiative" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "c8645d/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "greenInitiative" visibility = "green" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "orangeInitiative" visibility = "orange" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "tealInitiative" visibility = "teal" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "brownInitiative" visibility = "brown" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "pinkInitiative" visibility = "pink" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "redInitiative" visibility = "red" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "yellowInitiative" visibility = "yellow" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "whiteInitiative" visibility = "white" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <Button id = "requestInit" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="guidPlaceholder/requestInitiative" position = "850 150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
+        <InputField id = "blueInitiative" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "guidPlaceholder/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "purpleInitiative" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "guidPlaceholder/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "greenInitiative" visibility = "green" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "orangeInitiative" visibility = "orange" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "tealInitiative" visibility = "teal" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "brownInitiative" visibility = "brown" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "pinkInitiative" visibility = "pink" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "redInitiative" visibility = "red" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "yellowInitiative" visibility = "yellow" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "whiteInitiative" visibility = "white" onEndEdit = "guidPlaceholder/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
     </Panel>
 
     <Panel id = "gmInitPanel">
-        <Button id = "text_button_2" visibility = "host" position = "650 -430 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
-        <Button id = "gm_roll_initiative" visibility = "host" position = "655 -500 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "c8645d/rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
+        <Button id = "text_button_2" visibility = "host" position = "650 -262 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
+        <Button id = "gm_roll_initiative" visibility = "host" position = "650 -335 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "guidPlaceholder/rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
     </Panel>
 
     <Panel id = "turnPanel">
         <Button id = "text_button_3" position = "-450 400 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" color = "#ffcc00">Current turn: here</Button>
         <Button id = "text_button_4" position = "450 400 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" color = "#9900cc">Next turn: here</Button>
-        <Button id = "end_turn_button" position = "0 -400 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-        <Button id = "end_turn_gm" visibility = "host" position = "850 0 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/apiEndTurn">End Current Turn</Button>
-        <Button id = "end_combat_gm" visibility = "host" position = "850 -75 0" width = "200" height = "60" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/endCombat">End Combat</Button>
-        <Button id = "refresh_combat_gm" visibility = "host" position = "850 75 0" width = "200" height = "60" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/apiGetInit">Refresh Current Players</Button>
+        <Button id = "end_turn_button" position = "0 -400 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "guidPlaceholder/apiEndTurn">End Turn</Button>
+        <Button id = "end_turn_gm" visibility = "host" position = "850 0 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "guidPlaceholder/apiEndTurn">End Current Turn</Button>
+        <Button id = "end_combat_gm" visibility = "host" position = "850 -75 0" width = "200" height = "60" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "guidPlaceholder/endCombat">End Combat</Button>
+        <Button id = "refresh_combat_gm" visibility = "host" position = "850 75 0" width = "200" height = "60" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "guidPlaceholder/apiGetInit">Refresh Current Players</Button>
+    </Panel>
+
+    <Panel id = "partySkillPanel">
+        <Button id = "requestPartySkill" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="guidPlaceholder/requestPartySkillCheck" position = "850 -150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
+        <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "guidPlaceholder/addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "guidPlaceholder/addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "greenSkill" visibility = "green" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "orangeSkill" visibility = "orange" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "tealSkill" visibility = "teal" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "brownSkill" visibility = "brown" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "pinkSkill" visibility = "pink" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "redSkill" visibility = "red" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "yellowSkill" visibility = "yellow" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <InputField id = "whiteSkill" visibility = "white" onEndEdit = "guidPlaceholder/addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+        <Button id = "text_button_5" position = "600 -12 0" width = "250" height = "400" colors = "#CA5AF8|#CA5AF8|#CA5AF8|#CA5AF8" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+        <Button id = "openPartySkillViewer" visibility = "host" color = "#cc0000" onClick="guidPlaceholder/skillPopupToggle" position = "850 -200 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Party Skill Viewer</Button>
     </Panel>
 </Panel>
 ]]
@@ -110,7 +127,19 @@ endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
 refreshCombatID = "refresh_combat_gm"
 addAPlayerID = "addAPlayer"
-closePlayerSelectorID = "closePlayerSelector"
+requestSkillID = "requestPartySkill"
+whiteSkillID = "whiteSkill"
+blueSkillID = "blueSkill"
+greenSkillID = "greenSkill"
+yellowSkillID = "yellowSkill"
+purpleSkillID = "purpleSkill"
+redSkillID = "redSkill"
+orangeSkillID = "orangeSkill"
+tealSkillID = "tealSkill"
+pinkSkillID = "pinkSkill"
+brownSkillID = "brownSkill"
+skillTextID = "text_button_5"
+openPartySkillViewerID = "openPartySkillViewer"
 
 -- Game constants:
 
@@ -131,10 +160,11 @@ BUTTON_COLOR_9 = "#00ffcc"
 BUTTON_COLOR_10 = "#009933"
 BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
+CR_STRING = [[%pCR%s]]
+CR_STRING_2 = [[%p%d]]
 -- ATTRIBUTES = "attributes"
 -- ID = "id"
 -- CHILDREN = "children"
-CR_STRING = "CR "
 
 -- Game variables:
 
@@ -149,8 +179,9 @@ pcSelectorActive = false
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
-    -- print(XML_STRING)
-    UI.setXml(XML_STRING)
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function onUpdate()
@@ -182,7 +213,19 @@ function makePcList(pcListFromServer)
     numberOfPCs = #(pcList)
     displayPcs()
     UI.setAttribute(addAPlayerID, "active", "true")
-    UI.setAttribute(closePlayerSelectorID, "active", "true")
+end
+
+function addPlayerToggle()
+    if UI.getAttribute(addAPlayerID, "text") == "Open Player Selector" then
+        UI.setAttribute(addAPlayerID, "text", "Close Player Selector")
+        UI.setAttribute(addAPlayerID, "color", BUTTON_COLOR_6)
+        displayPcs()
+    else
+        UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
+        UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE)
+        closePcSelector()
+
+    end
 end
 
 function displayPcs()
@@ -193,7 +236,12 @@ function displayPcs()
         buttonId = "buttonId" .. tostring(i)
         UI.setAttribute(buttonId, "active", "true")
         UI.setAttribute(buttonId, "text", name)
-        UI.setAttribute(buttonId, "onClick", "c8645d/playerSelected("..name..")") -- also add c8645d/ here
+        if isTabletopObject then
+            UI.setAttribute(buttonId, "onClick", objectGuid.."/playerSelected("..name..")")
+        else
+            UI.setAttribute(buttonId, "onClick", "playerSelected("..name..")")
+        end
+        
     end
 
     UI.setAttribute(textButtonID, "active", "true")
@@ -213,6 +261,8 @@ function playerSelected(player, name, id)
         apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        UI.setAttribute(requestSkillID, "active", "true")
+        UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
         checkIfAllPCsSelected()
     end
 end
@@ -293,8 +343,9 @@ function checkIfAllPCsSelected()
     end
     -- print(foundNames)
     if foundNames == numberOfPCs then
-        closePcSelector()
+        addPlayerToggle()
         UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
+        UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
     end
 end
 
@@ -394,6 +445,109 @@ function endCombat()
     UI.setAttribute(nextPlayerID, "active", "false")
 end
 
+-- Party skill check functions:()
+
+function requestPartySkillCheck()
+    if  pcSelectorActive then
+        closePcSelector()
+    end
+    skillNameList = ""
+    statsString = ""
+    statsList = {}
+    broadcastToAll("It\'s time for a skill check!")
+    -- for each color, if a PC, activate that UI element to request skill
+    if isNotEmpty(playerColorMap.White) then
+        UI.setAttribute(whiteSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Red) then
+        UI.setAttribute(redSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Orange) then
+        UI.setAttribute(orangeSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Brown) then
+        UI.setAttribute(brownSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Pink) then
+        UI.setAttribute(pinkSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Purple) then
+        UI.setAttribute(purpleSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Yellow) then
+        UI.setAttribute(yellowSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Blue) then
+        UI.setAttribute(blueSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Green) then
+        UI.setAttribute(greenSkillID, "active", "true")
+    end
+    if isNotEmpty(playerColorMap.Teal) then
+        UI.setAttribute(tealSkillID, "active", "true")
+    end
+    UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
+end
+
+function addPlayerSkill(player, skillTotal, id)
+    UI.setAttribute(id, "active", "false")
+    name03 = findPlayerNameFromColor(player.color)
+    -- print(name03)
+    addNameToPartySkillPopup(name03, skillTotal)
+end
+
+function addNameToPartySkillPopup(skillName, skillTotal)
+    skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
+    table.insert(statsList,tonumber(skillTotal))
+    UI.setAttribute(skillTextID, "text", "Party Results:\n"..skillNameList.."\nStatistics:\n["..getSkillStatistics().."]")
+    UI.setAttribute(skillTextID, "active", "true")
+
+    UI.setAttribute(openPartySkillViewerID, "active", "true")
+end
+
+function getSkillStatistics()
+    
+    -- get the total, mean, & median
+    local sum = 0
+    for _,number in pairs(statsList) do
+        print("number: "..tostring(number))
+        sum = sum + number
+    end
+
+    if #statsList < 2 then
+        return "Total: "..tostring(sum)
+    end
+
+    local mean = sum / #(statsList)
+
+    table.sort(statsList)
+    local mid = #statsList/2
+    local median = 0
+    print("mid: "..tostring(mid))
+    if math.floor(mid)==mid then
+        median = nums[mid]
+    else
+        median = (statsList[math.floor(mid)]+statsList[math.ceil(mid)])/2
+    end
+
+    statsString = "Total: "..tostring(sum)..", Average: "..tostring(mean)..", Middle: "..tostring(median)
+    return statsString
+end
+
+function skillPopupToggle()
+    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Skill Viewer" then
+        UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
+        UI.setAttribute(skillTextID, "active", "true")
+        UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
+    else
+        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "color", PROMPT_BLUE)
+        UI.setAttribute(skillTextID, "active", "false")
+        UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
+    end
+end
+
 -- Turn & time functions:
 
 function announceTurn(currPlayer)
@@ -458,7 +612,9 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    nextPlayer = cutOutCRtext(nextPlayer)
+    if isCharacterNpc(nextPlayer) then
+        nextPlayer = cutOutCRtext(nextPlayer)
+    end
     nextTurnName = nextPlayer
     UI.setAttribute(nextPlayerID, "active", "true")
     UI.setAttribute(nextPlayerID, "text", "Next Turn: "..nextTurnName)
@@ -654,11 +810,32 @@ function isCharacterNpc(str)
 end
 
 function cutOutCRtext(str)
-    if str:find(CR_STRING) then
-        -- print("CR str: " .. str)
-        p, q = str:find(CR_STRING)
-        str = string.sub(str, 1, p-3) -- cut off the ( too
-        -- print(str)
+    -- print("CR str: " .. CR_STRING..", name: "..str)
+    p, q = str:find(CR_STRING)
+    r, s = str:find(CR_STRING_2)
+    if r ~= nil then -- numbered npc, add the number
+        local stringA = string.sub(str, 1, p-1)
+        local stringB = string.sub(str, r+1, string.len(str))
+        str = stringA..stringB
+    else -- un-numbered npc
+        str = string.sub(str, 1, p-2) -- cut off the space too
     end
+    -- print("non CR str: "..str)
     return str
+end
+
+-- Object XML Utility functions:
+
+function setupObjectXmlUI()
+    objectGuid = "guid1234"-- getGUID()
+    local newXML = replaceXmlGuid(XML_STRING, objectGuid)
+    UI.setXml(newXML)
+end
+
+function replaceXmlGuid(xml, guid)
+    print("XML: "..xml)
+    print("GUID: "..guid)
+    xml = xml:gsub("guidPlaceholder", guid)
+    print("New XML: "..xml)
+    return xml
 end
