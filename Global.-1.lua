@@ -213,7 +213,7 @@ function updatePlayerButtons()
     for m = 1, 12, 1 do
         buttonId = "buttonId" .. tostring(m)
         playerName02 = UI.getAttribute(buttonId, "text")
-        print(playerName02)
+        -- print(playerName02)
         setColor = DEFAULT_RED_PINK
 
         if isPlayerInColorMap(playerName02) then
@@ -277,7 +277,7 @@ function checkIfAllPCsSelected()
     foundNames = 0
     for k = 1, numberOfPCs, 1 do
         name = shaveString(pcList[k])
-        print(name)
+        -- print(name)
         if isPlayerInColorMap(name) then
             foundNames = foundNames + 1 
         end
