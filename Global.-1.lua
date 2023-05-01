@@ -201,17 +201,16 @@ function playerSelected(player, name, id)
         broadcastToAll(player.steam_name .. " (" .. player.color .. ") selected: " .. name)
         playerColorMap[tostring(player.color)] = name
         updatePlayerButtons()
-        addToMap(name) -- API call, add character to map
-
+        apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
-        checkIfAllPCsSelected() -- close the PC selector if all are chosen
+        checkIfAllPCsSelected()
     end
 end
 
 function updatePlayerButtons()
     -- set any selected buttons to SELECTED_GREY, all others to default
-    for m = 1, 12, 1 do -- set buttons to inactive & reset color
+    for m = 1, 12, 1 do
         buttonId = "buttonId" .. tostring(m)
         playerName02 = UI.getAttribute(buttonId, "text")
         print(playerName02)
@@ -283,9 +282,8 @@ function checkIfAllPCsSelected()
             foundNames = foundNames + 1 
         end
     end
-
-    print(foundNames)
-    if foundNames == numberOfPCs then -- close the PC selector
+    -- print(foundNames)
+    if foundNames == numberOfPCs then
         closePcSelector()
         UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
     end
@@ -345,7 +343,6 @@ end
 
 function addPlayerInitiative(player, initTotal, id)
     UI.setAttribute(id, "active", "false")
-    -- print(initTotal)
     name01 = findPlayerNameFromColor(player.color)
     -- print(name01)
     addNameToGMPopup(name01, initTotal)
@@ -460,12 +457,11 @@ end
 
 function announceTime(currRound)
     print("The current time is: "..currRound)
-    displayTurnOrder() -- refresh!
+    displayTurnOrder() -- refresh on end turn
 end
 
 function displayTurnOrder()
-    -- broadcastToAll(initiativeList)
-    -- buildInitiativeRow(initiativeList)
+    -- refresh!
     getCurrentPlayer()
     getNextPlayer()    
 
@@ -489,10 +485,9 @@ function loadPlayerData()
     end)
 end
 
-function addToMap(name)
+function apiAddToMap(name)
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TO_MAP_PATH
     -- print("url: " .. url)
-    -- print(name)
     WebRequest.post(url, name, function(request)
         if request.is_error then
             print("error: " .. request.error)
