@@ -1,6 +1,73 @@
+-- Object.lua: 
+-- 1) Copy the code below into the object's lua in the scripting editor.
+-- 2) Add c8645d/ to the button onlick attributes in displayPcs()
+-- 3) Save the object.
+-- 4) When you load in the object, it will load the D&D Combat Assistant.
+-- The main difference is that the global UI is set to XML_STRING on load.
+
+
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
+
+-- XML constant: 
+
+XML_STRING = [[
+<Panel id = "superPanel">
+    <Panel id = "ipSelectorPanel" position = "590 516 0">
+        <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "c8645d/storeIPAddress"  placeholder = "Input server address:" allowDragging = "true" returnToOriginalPositionWhenReleased = "false"></InputField>
+        <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="c8645d/changeIPAddress" width = "160" height = "30" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Change server address</Button>
+    </Panel>
+
+    <Panel id = "playerSelectorPanel">
+        <Button id = "text_button" position = "0 330 0" width = "700" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
+        <GridLayout id = "pc_list" childAlignment = "upperCenter" padding = "250 250 250 250" spacing = "20 10" cellSize = "300 75" active = "false">
+            <Button id = "buttonId1" onClick = "c8645d/playerSelected(Button One)" color = "#99ccff" fontStyle = "bold" fontSize = "16px" active = "false">Button One</Button>
+            <Button id = "buttonId2" onClick = "c8645d/playerSelected(Button Two)" color = "#3399ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Two</Button>
+            <Button id = "buttonId3" onClick = "c8645d/playerSelected(Button Three)" color = "#ff99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Three</Button>
+            <Button id = "buttonId4" onClick = "c8645d/playerSelected(Button Four)" color = "#cc99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Four</Button>
+            <Button id = "buttonId5" onClick = "c8645d/playerSelected(Button Five)" color = "#ff0066" fontStyle = "bold" fontSize = "16px" active = "false">Button Five</Button>
+            <Button id = "buttonId6" onClick = "c8645d/playerSelected(Button Six)" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false">Button Six</Button>
+            <Button id = "buttonId7" onClick = "c8645d/playerSelected(Button Seven)" color = "#ffcc99" fontStyle = "bold" fontSize = "16px" active = "false">Button Seven</Button>
+            <Button id = "buttonId8" onClick = "c8645d/playerSelected(Button Eight)" color = "#e48b07" fontStyle = "bold" fontSize = "16px" active = "false">Button Eight</Button>
+            <Button id = "buttonId9" onClick = "c8645d/playerSelected(Button Nine)" color = "#00ffcc" fontStyle = "bold" fontSize = "16px" active = "false">Button Nine</Button>
+            <Button id = "buttonId10" onClick = "c8645d/playerSelected(Button Ten)" color = "#009933" fontStyle = "bold" fontSize = "16px" active = "false">Button Ten</Button>
+            <Button id = "buttonId11" onClick = "c8645d/playerSelected(Button Eleven)" color = "#ebebeb" fontStyle = "bold" fontSize = "16px" active = "false">Button Eleven</Button>
+            <Button id = "buttonId12" onClick = "c8645d/playerSelected(Button Twelve)" color = "#bdbdbd" fontStyle = "bold" fontSize = "16px" active = "false">Button Twelve</Button>
+        </GridLayout>
+        <Button id = "addAPlayer" visibility = "host" color = "#3498DB" onClick="c8645d/displayPcs" position = "870 250 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Open Player Selector</Button>
+        <Button id = "closePlayerSelector" visibility = "host" color = "#cc0000" onClick="c8645d/closePcSelector" position = "870 210 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Player Selector</Button>
+    </Panel>
+
+    <Panel id = "initiativePanel">
+        <Button id = "requestInit" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="c8645d/requestInitiative" position = "850 150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
+        <InputField id = "blueInitiative" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "c8645d/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "purpleInitiative" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "c8645d/addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "greenInitiative" visibility = "green" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "orangeInitiative" visibility = "orange" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "tealInitiative" visibility = "teal" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "brownInitiative" visibility = "brown" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "pinkInitiative" visibility = "pink" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "redInitiative" visibility = "red" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "yellowInitiative" visibility = "yellow" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+        <InputField id = "whiteInitiative" visibility = "white" onEndEdit = "c8645d/addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    </Panel>
+
+    <Panel id = "gmInitPanel">
+        <Button id = "text_button_2" visibility = "host" position = "650 -430 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
+        <Button id = "gm_roll_initiative" visibility = "host" position = "655 -500 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "c8645d/rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
+    </Panel>
+
+    <Panel id = "turnPanel">
+        <Button id = "text_button_3" position = "-450 400 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" color = "#ffcc00">Current turn: here</Button>
+        <Button id = "text_button_4" position = "450 400 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" color = "#9900cc">Next turn: here</Button>
+        <Button id = "end_turn_button" position = "0 -400 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
+        <Button id = "end_turn_gm" visibility = "host" position = "850 0 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/apiEndTurn">End Current Turn</Button>
+        <Button id = "end_combat_gm" visibility = "host" position = "850 -75 0" width = "200" height = "60" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/endCombat">End Combat</Button>
+        <Button id = "refresh_combat_gm" visibility = "host" position = "850 75 0" width = "200" height = "60" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "c8645d/apiGetInit">Refresh Current Players</Button>
+    </Panel>
+</Panel>
+]]
 
 -- Network constants:
 
@@ -81,6 +148,8 @@ pcSelectorActive = false
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
+    -- print(XML_STRING)
+    UI.setXml(XML_STRING)
 end
 
 function onUpdate()
@@ -123,7 +192,7 @@ function displayPcs()
         buttonId = "buttonId" .. tostring(i)
         UI.setAttribute(buttonId, "active", "true")
         UI.setAttribute(buttonId, "text", name)
-        UI.setAttribute(buttonId, "onClick", "playerSelected("..name..")")
+        UI.setAttribute(buttonId, "onClick", "c8645d/playerSelected("..name..")") -- also add c8645d/ here
     end
 
     UI.setAttribute(textButtonID, "active", "true")
@@ -592,57 +661,3 @@ function cutOutCRtext(str)
     end
     return str
 end
-
-
--- Recursive XML functions:
-
--- characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"}
-
--- function getElementByIdFromRoot(root, id)
---     for _,childTable in pairs(root) do
---         local table = childTable
---         local foundElement = getElementById(table, id)
---         if foundElement != nil then 
---             return foundElement
---         end
---     end
---     return nil
--- end
-
--- function getElementById(xmlTable, id)
---     local parentTable = xmlTable
-
---     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
---         return parentTable
-
---     else
---             if type(parentTable[CHILDREN]) == "table" then
---                 for _, childTable in pairs(parentTable[CHILDREN]) do
---                     parentTable = childTable
---                     local foundElement = getElementById(parentTable,id)
---                     if foundElement != nil then
---                         return foundElement
---                     end
---                 end  
---             end
-
---     end
-
---     return nil
--- end
-
--- function buildInitiativeRow(fullInitiativeOrder)
---     UI.setAttribute(turnOrderID, "active", "true")
-
---     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
-
---     broadcastToAll(gottenElement[ATTRIBUTES][ID])
---     --we have to locate the xml element that will contain 
-    
---     -- now populate the xml:
-
-
---     for _, characterName in ipairs(fullInitiativeOrder) do
---         broadcastToAll(characterName)
---     end
--- end
