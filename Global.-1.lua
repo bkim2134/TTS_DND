@@ -131,7 +131,6 @@ CR_STRING = "CR "
 
 pcList = {}
 numberOfPCs = 0
--- characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"} -- todo: remove!
 playerColorMap = {White = "", Red = "", Brown = "", Orange = "", Yellow = "", Green = "", Teal = "", Blue = "", Purple = "", Pink = ""}
 currentTurnName = ""
 nextTurnName = ""
@@ -142,11 +141,11 @@ pcSelectorActive = false
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
     -- print(XML_STRING)
-    UI.setXml(XML_STRING)
+    -- UI.setXml(XML_STRING) -- necessary for use with objects
 end
 
 function onUpdate()
-    --[[ print('onUpdate loop!') --]]
+    -- print('onUpdate loop!')
 end
 
 -- Network setup functions:
@@ -662,6 +661,8 @@ end
 
 
 -- Recursive XML functions:
+
+-- characters = {"Sam", "Frodo", "Bilbo", "Gandalf", "Saruman"}
 
 -- function getElementByIdFromRoot(root, id)
 --     for _,childTable in pairs(root) do
