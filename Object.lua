@@ -1,9 +1,10 @@
 -- Object.lua: 
--- 1) Copy the code below into the object's lua in the scripting editor.
--- 2) Add c8645d/ to the button onlick attributes in displayPcs()
--- 3) Save the object.
--- 4) When you load in the object, it will load the D&D Combat Assistant.
--- The main difference is that the global UI is set to XML_STRING on load.
+-- 0) Follow the steps in Object.xml.
+-- 1) Add 'UI.setXml(XML_STRING)' to the onLoad() function.
+-- 2) Add 'c8645d/' to the button onClick attributes in the displayPcs() function.
+-- 3) Copy the code below into the object's lua in the scripting editor.
+-- 4) Save the object. I like to name it 'D&D Combat Assistant engine'.
+-- 5) When you load in the object, it will load the D&D Combat Assistant.
 
 
 -- Tabletop Simulator Connector for D&D Combat Assistant

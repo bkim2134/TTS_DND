@@ -1,6 +1,6 @@
 <!-- Object.xml: -->
-<!-- 1) Paste the below XML into XML_STRING in Object.lua. -->
-<!-- The main difference is that the XML onCLick functions reference the object c8645d. -->
+<!-- 1) add 'c8645d/' in front of the function names for any onCLick or onEndEdit attributes -->
+<!-- 2) Paste the below XML into XML_STRING in Object.lua. -->
 
 
 <Panel id = "superPanel">
