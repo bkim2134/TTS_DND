@@ -22,6 +22,8 @@ ADD_TO_MAP_PATH = "/playermenu/movetomap"
 NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
 GET_NEXT_PLAYER_PATH = "/playermenu/getnextcharacter"
+GET_TIMED_EFFECTS_PATH = "/playermenu/gettimedeffects"
+ADD_TIMED_EFFECT_PATH = "/playermenu/addtimedeffect"
 
 -- XML id constants:
 
@@ -63,6 +65,13 @@ pinkSkillID = "pinkSkill"
 brownSkillID = "brownSkill"
 skillTextID = "text_button_5"
 openPartySkillViewerID = "openPartySkillViewer"
+addTimedEffectID = "add_timed_effect"
+addTimedEffectDurationID = "timed_effect_duration"
+addTimedEffectTargetsID = "timed_effect_targets"
+addTimedEffectNameID = "timed_effect_name"
+timedEffectTextID = "text_button_6"
+cancelTimedEffectID = "cancel_timed_effect"
+confirmTimedEffectID = "confirm_timed_effect"
 
 -- Game constants:
 
@@ -356,6 +365,7 @@ function rollGmInitiative()
     UI.setAttribute(gmInitiativeID, "active", "false")
     -- broadcastToAll("Rolling npcs...")
     apiRollInit()
+    displayTurnOrder()
     UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
 end
 
@@ -366,9 +376,10 @@ function endCombat()
     UI.setAttribute(refreshCombatID, "active", "false")
     UI.setAttribute(currentPlayerID, "active", "false")
     UI.setAttribute(nextPlayerID, "active", "false")
+    UI.setAttribute(addTimedEffectID, "active", "false")
 end
 
--- Party skill check functions:()
+-- Party skill check functions:
 
 function requestPartySkillCheck()
     if  pcSelectorActive then
@@ -422,10 +433,11 @@ end
 function addNameToPartySkillPopup(skillName, skillTotal)
     skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
     table.insert(statsList,tonumber(skillTotal))
-    UI.setAttribute(skillTextID, "text", "Party Results:\n"..skillNameList.."\nStatistics:\n["..getSkillStatistics().."]")
+    UI.setAttribute(skillTextID, "text", "Party Skill Results:\n"..skillNameList.."\nStatistics:\n["..getSkillStatistics().."]")
     UI.setAttribute(skillTextID, "active", "true")
 
     UI.setAttribute(openPartySkillViewerID, "active", "true")
+    activateClosePartySkillButton()
 end
 
 function getSkillStatistics()
@@ -459,16 +471,20 @@ end
 
 function skillPopupToggle()
     if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Skill Viewer" then
-        UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
-        UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
-        UI.setAttribute(skillTextID, "active", "true")
-        UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
+        activateClosePartySkillButton()
     else
         UI.setAttribute(openPartySkillViewerID, "text", "Open Party Skill Viewer")
         UI.setAttribute(openPartySkillViewerID, "color", PROMPT_BLUE)
         UI.setAttribute(skillTextID, "active", "false")
         UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
     end
+end
+
+function activateClosePartySkillButton()
+    UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
+    UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
+    UI.setAttribute(skillTextID, "active", "true")
+    UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
 end
 
 -- Turn & time functions:
@@ -553,9 +569,69 @@ function displayTurnOrder()
     getCurrentPlayer()
     getNextPlayer()    
 
+    apiGetInit()
+    displayTimedEffects()
+
     UI.setAttribute(endTurnGmID, "active", "true")
     UI.setAttribute(endCombatID, "active", "true")
     UI.setAttribute(refreshCombatID, "active", "true")
+    UI.setAttribute(addTimedEffectID, "active", "true")
+end
+
+-- Timed Effect functions:
+
+function addTimedEffect(player)
+    broadcastToAll(findPlayerNameFromColor(player.color).." is adding a timed effect...")
+    effectName = ""
+    effectTargets = ""
+    effectDuration = ""
+    UI.setAttribute(addTimedEffectDurationID, "active", "true")
+    UI.setAttribute(addTimedEffectTargetsID, "active", "true")
+    UI.setAttribute(addTimedEffectNameID, "active", "true")
+    UI.setAttribute(timedEffectTextID, "active", "true")
+    UI.setAttribute(cancelTimedEffectID, "active", "true")
+    UI.setAttribute(confirmTimedEffectID, "active", "true")
+    UI.setAttribute(addTimedEffectID, "visibility", "host") -- hide the button (host has cancel override)
+    UI.setAttribute(addTimedEffectID, "text", "Cancel Timed Effect")
+    UI.setAttribute(addTimedEffectID, "onClick", "closeTimedEffectCreator")
+    UI.setAttribute(addTimedEffectID, "color", DEFAULT_RED_PINK)
+end
+
+function closeTimedEffectCreator()
+    UI.setAttribute(addTimedEffectDurationID, "active", "false")
+    UI.setAttribute(addTimedEffectTargetsID, "active", "false")
+    UI.setAttribute(addTimedEffectNameID, "active", "false")
+    UI.setAttribute(timedEffectTextID, "active", "false")
+    UI.setAttribute(cancelTimedEffectID, "active", "false")
+    UI.setAttribute(confirmTimedEffectID, "active", "false")
+    UI.setAttribute(addTimedEffectID, "visibility", "") -- show the button to all players again
+    UI.setAttribute(addTimedEffectID, "text", "Add Timed Effect")
+    UI.setAttribute(addTimedEffectID, "onClick", "addTimedEffect")
+    UI.setAttribute(addTimedEffectID, "color", PROMPT_BLUE)
+end
+
+function addTimedEffectName(player, effName, id)
+    effectName = effName
+end
+
+function addTimedEffectTargets(player, targets, id)
+    effectTargets = targets
+end
+
+function addTimedEffectDuration(player, duration, id)
+    effectDuration = duration
+end
+
+function confirmTimedEffect()
+    timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..effectName.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
+    print("timedEffectListToSend: "..timedEffectListToSend)
+    apiAddTimedEffect(timedEffectListToSend)
+    displayTimedEffects()
+end
+
+function displayTimedEffects() -- appear only in combat, dissapear when combat ends
+    apiGetTimedEffects()
+
 end
 
 -- API functions:
@@ -593,8 +669,8 @@ function apiRollInit()
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
-        else
-            displayTurnOrder();
+        -- else
+        --     print(request.text)
         end
     end)
 end
@@ -607,10 +683,36 @@ function apiGetInit()
             print("error: " .. request.error)
             log(request.error)
         else
-            displayTurnOrder();
+            -- print(request.text)
         end
     end)
     
+end
+
+function apiGetTimedEffects()
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_TIMED_EFFECTS_PATH
+    -- print("url: " .. url)
+    WebRequest.get(url, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            print(request.text)
+        end
+    end)
+end
+
+function apiAddTimedEffect(timedEffectList)
+    url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TIMED_EFFECT_PATH
+    -- print("url: " .. url)
+    WebRequest.post(url, timedEffectList, function(request)
+        if request.is_error then
+            print("error: " .. request.error)
+            log(request.error)
+        else
+            print(request.text)
+        end
+    end)
 end
 
 function getCurrentPlayer()
@@ -685,8 +787,6 @@ function findPlayerNameFromColor(playerColor)
                                     else
                                         if playerColor == "Pink" then
                                             playerName = playerColorMap.Pink
-                                        else
-                                            playerName = "No name found for color "..playerColor
                                         end
                                     end
                                 end
@@ -696,6 +796,9 @@ function findPlayerNameFromColor(playerColor)
                 end
             end
         end
+    end
+    if playerName == nil or playerName == "" then
+        playerName = "Somebody"
     end
     -- print("player name: " .. playerName)
     return playerName
@@ -756,10 +859,10 @@ function setupObjectXmlUI()
 end
 
 function replaceXmlGuid(xml, guid)
-    print("XML: "..xml)
-    print("GUID: "..guid)
+    -- print("XML: "..xml)
+    -- print("GUID: "..guid)
     xml = xml:gsub("guidPlaceholder", guid)
-    print("New XML: "..xml)
+    -- print("New XML: "..xml)
     return xml
 end
 
