@@ -43,12 +43,14 @@ endCombatID = "end_combat_gm"
 refreshCombatID = "refresh_combat_gm"
 addAPlayerID = "addAPlayer"
 closePlayerSelectorID = "closePlayerSelector"
+playerSelectorPanelID = "playerSelectorPanel"
 
 -- Game constants:
 
 SELECTED_GREY = "#787878"
 PROMPT_BLUE = "#3498DB"
 NPC_PURPLE = "#9B59B6"
+DEFAULT_BLUE_GREY = "#5c7091"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULTY_GREY = "#d1d1d1"
 BUTTON_COLOR_1 = "#99ccff"
@@ -78,6 +80,10 @@ nextTurnName = ""
 pcSelectorActive = false
 
 -- Core functions:
+
+function onObjectSpawn(object)
+    print(object.getGUID())
+end
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
@@ -127,6 +133,7 @@ function displayPcs()
     end
 
     UI.setAttribute(textButtonID, "active", "true")
+    UI.setAttribute(playerSelectorPanelID, "active", "true")
     UI.setAttribute(pcListID, "active", "true")
     pcSelectorActive = true
 end
@@ -230,6 +237,7 @@ end
 
 function closePcSelector()
     UI.setAttribute(textButtonID, "active", "false")
+    UI.setAttribute(playerSelectorPanelID, "active", "false")
     UI.setAttribute(pcListID, "active", "false")
     pcSelectorActive = false
 end
@@ -458,6 +466,13 @@ function apiGetInit()
             print("error: " .. request.error)
             log(request.error)
         else
+            --this is where we decode the json and put it into a usable object
+            local responseBody = JSON.decode(request.text)
+            
+            for i, v in pairs( responseBody ) do
+                print(i,responseBody[i]["name"])
+                print(i,responseBody[i]["hp"])
+            end
             displayTurnOrder();
         end
     end)
