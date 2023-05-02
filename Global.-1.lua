@@ -69,6 +69,7 @@ addTimedEffectID = "add_timed_effect"
 addTimedEffectDurationID = "timed_effect_duration"
 addTimedEffectTargetsID = "timed_effect_targets"
 addTimedEffectNameID = "timed_effect_name"
+timedEffectEffectID = "timed_effect_effect"
 timedEffectTextID = "text_button_6"
 cancelTimedEffectID = "cancel_timed_effect"
 confirmTimedEffectID = "confirm_timed_effect"
@@ -342,7 +343,7 @@ end
 
 function addNameToGMPopup(pName, initiativeTotal)
         initNameList = initNameList..pName..":"..initiativeTotal..", "
-        initListForDisplay = "{" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "}"
+        initListForDisplay = "[" .. string.sub(initNameList, 1, string.len(initNameList)-2) .. "]"
 
         UI.setAttribute(gmInitTextID, "active", "true")
         UI.setAttribute(gmInitTextID, "text", initListForDisplay)
@@ -582,12 +583,15 @@ end
 
 function addTimedEffect(player)
     broadcastToAll(findPlayerNameFromColor(player.color).." is adding a timed effect...")
+    setTimedEffectColor(player.color)
     effectName = ""
     effectTargets = ""
     effectDuration = ""
+    timedEffectEffect = ""
     UI.setAttribute(addTimedEffectDurationID, "active", "true")
     UI.setAttribute(addTimedEffectTargetsID, "active", "true")
     UI.setAttribute(addTimedEffectNameID, "active", "true")
+    UI.setAttribute(timedEffectEffectID, "active", "true")
     UI.setAttribute(timedEffectTextID, "active", "true")
     UI.setAttribute(cancelTimedEffectID, "active", "true")
     UI.setAttribute(confirmTimedEffectID, "active", "true")
@@ -597,21 +601,37 @@ function addTimedEffect(player)
     UI.setAttribute(addTimedEffectID, "color", DEFAULT_RED_PINK)
 end
 
+function setTimedEffectColor(pColor)
+    UI.setAttribute(addTimedEffectDurationID, "visibility", pColor)
+    UI.setAttribute(addTimedEffectTargetsID, "visibility", pColor)
+    UI.setAttribute(addTimedEffectNameID,"visibility", pColor)
+    UI.setAttribute(timedEffectEffectID, "visibility", pColor)
+    UI.setAttribute(timedEffectTextID, "visibility", pColor)
+    UI.setAttribute(cancelTimedEffectID, "visibility", pColor)
+    UI.setAttribute(confirmTimedEffectID, "visibility", pColor)
+end
+
 function closeTimedEffectCreator()
     UI.setAttribute(addTimedEffectDurationID, "active", "false")
     UI.setAttribute(addTimedEffectTargetsID, "active", "false")
     UI.setAttribute(addTimedEffectNameID, "active", "false")
+    UI.setAttribute(timedEffectEffectID, "active", "false")
     UI.setAttribute(timedEffectTextID, "active", "false")
     UI.setAttribute(cancelTimedEffectID, "active", "false")
     UI.setAttribute(confirmTimedEffectID, "active", "false")
     UI.setAttribute(addTimedEffectID, "visibility", "") -- show the button to all players again
     UI.setAttribute(addTimedEffectID, "text", "Add Timed Effect")
     UI.setAttribute(addTimedEffectID, "onClick", "addTimedEffect")
+    setTimedEffectColor("host")
     UI.setAttribute(addTimedEffectID, "color", PROMPT_BLUE)
 end
 
 function addTimedEffectName(player, effName, id)
     effectName = effName
+end
+
+function addTimedEffectEffect(player, effectEffect, id)
+    timedEffectEffect = effectEffect
 end
 
 function addTimedEffectTargets(player, targets, id)
@@ -622,11 +642,13 @@ function addTimedEffectDuration(player, duration, id)
     effectDuration = duration
 end
 
-function confirmTimedEffect()
-    timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..effectName.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
+function confirmTimedEffect(player, id)
+    timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
     print("timedEffectListToSend: "..timedEffectListToSend)
-    apiAddTimedEffect(timedEffectListToSend)
-    displayTimedEffects()
+    if apiAddTimedEffect(timedEffectListToSend, player.color) then
+        closeTimedEffectCreator()
+        displayTimedEffects()
+    end
 end
 
 function displayTimedEffects() -- appear only in combat, dissapear when combat ends
@@ -702,17 +724,20 @@ function apiGetTimedEffects()
     end)
 end
 
-function apiAddTimedEffect(timedEffectList)
+function apiAddTimedEffect(timedEffectList, pColor)
+    local success = false
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TIMED_EFFECT_PATH
     -- print("url: " .. url)
     WebRequest.post(url, timedEffectList, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            -- print("color: "..pColor)
+            broadcastToColor("Unable to add timed effect.", pColor)
         else
+            success = true
             print(request.text)
         end
     end)
+    return success
 end
 
 function getCurrentPlayer()
