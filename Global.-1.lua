@@ -73,6 +73,12 @@ timedEffectEffectID = "timed_effect_effect"
 timedEffectTextID = "text_button_6"
 cancelTimedEffectID = "cancel_timed_effect"
 confirmTimedEffectID = "confirm_timed_effect"
+displayTimedEffectsTextID = "text_button_7"
+timedEffect1ID = "text_button_8"
+timedEffect2ID = "text_button_9"
+timedEffect3ID = "text_button_10"
+timedEffectsDownID = "timed_effects_down_button"
+timedEffectsUpID = "timed_effects_up_button"
 
 -- Game constants:
 
@@ -80,6 +86,7 @@ SELECTED_GREY = "#787878"
 PROMPT_BLUE = "#3498DB"
 NPC_PURPLE = "#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
+DEFAULT_BLUE_GREY = "#5c7091"
 DEFAULTY_GREY = "#d1d1d1"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
@@ -107,6 +114,7 @@ playerColorMap = {White = "", Red = "", Brown = "", Orange = "", Yellow = "", Gr
 currentTurnName = ""
 nextTurnName = ""
 pcSelectorActive = false
+timedEffectsList = {}
 
 -- Core functions:
 
@@ -378,6 +386,7 @@ function endCombat()
     UI.setAttribute(currentPlayerID, "active", "false")
     UI.setAttribute(nextPlayerID, "active", "false")
     UI.setAttribute(addTimedEffectID, "active", "false")
+    closeTimedEffects()
 end
 
 -- Party skill check functions:
@@ -562,6 +571,7 @@ end
 
 function announceTime(currRound)
     print("The current time is: "..currRound)
+    apiGetInit()
     displayTurnOrder() -- refresh on end turn
 end
 
@@ -570,7 +580,6 @@ function displayTurnOrder()
     getCurrentPlayer()
     getNextPlayer()    
 
-    apiGetInit()
     displayTimedEffects()
 
     UI.setAttribute(endTurnGmID, "active", "true")
@@ -597,7 +606,11 @@ function addTimedEffect(player)
     UI.setAttribute(confirmTimedEffectID, "active", "true")
     UI.setAttribute(addTimedEffectID, "visibility", "host") -- hide the button (host has cancel override)
     UI.setAttribute(addTimedEffectID, "text", "Cancel Timed Effect")
-    UI.setAttribute(addTimedEffectID, "onClick", "closeTimedEffectCreator")
+    if isTabletopObject then
+        UI.setAttribute(addTimedEffectID, "onClick", objectGuid.."/closeTimedEffectCreator")
+    else
+        UI.setAttribute(addTimedEffectID, "onClick", "closeTimedEffectCreator")
+    end
     UI.setAttribute(addTimedEffectID, "color", DEFAULT_RED_PINK)
 end
 
@@ -621,7 +634,11 @@ function closeTimedEffectCreator()
     UI.setAttribute(confirmTimedEffectID, "active", "false")
     UI.setAttribute(addTimedEffectID, "visibility", "") -- show the button to all players again
     UI.setAttribute(addTimedEffectID, "text", "Add Timed Effect")
-    UI.setAttribute(addTimedEffectID, "onClick", "addTimedEffect")
+    if isTabletopObject then
+        UI.setAttribute(addTimedEffectID, "onClick", objectGuid.."/addTimedEffect")
+    else
+        UI.setAttribute(addTimedEffectID, "onClick", "addTimedEffect")
+    end
     setTimedEffectColor("host")
     UI.setAttribute(addTimedEffectID, "color", PROMPT_BLUE)
 end
@@ -644,16 +661,132 @@ end
 
 function confirmTimedEffect(player, id)
     timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
-    print("timedEffectListToSend: "..timedEffectListToSend)
-    if apiAddTimedEffect(timedEffectListToSend, player.color) then
-        closeTimedEffectCreator()
-        displayTimedEffects()
+    -- print("timedEffectListToSend: "..timedEffectListToSend)
+    apiAddTimedEffect(timedEffectListToSend, player.color)
+    closeTimedEffectCreator()
+    displayTimedEffects()
+end
+
+function receiveTimedEffects(timedEffectsStr)
+    print("received: "..timedEffectsStr)
+    timedEffectsList = {{Name="",Effect="",Targets="",RoundsLeft=""}}
+    timedEffectsList = getTimedEffectListFromJson(timedEffectsStr)
+    -- print(timedEffectsList[1].Name)
+end
+
+function getTimedEffectListFromJson(timedEffectJsonStr)
+    local effectsList = {}
+    local responseBody = JSON.decode(timedEffectJsonStr)
+    for i, v in pairs( responseBody ) do
+        local tempEffectList = {Name="",Effect="",Targets="",RoundsLeft=""}
+        tempEffectList.Name = responseBody[i]["name"]
+        tempEffectList.Effect = responseBody[i]["effect"]
+        tempEffectList.Targets = responseBody[i]["targets"]
+        tempEffectList.RoundsLeft = responseBody[i]["timeLeft"]
+        -- print(tempEffectList.Effect)
+        table.insert(effectsList,tempEffectList)
+        -- print(effectsList[i].Name)
     end
+    return effectsList
 end
 
 function displayTimedEffects() -- appear only in combat, dissapear when combat ends
-    apiGetTimedEffects()
+    apiGetTimedEffects() --calls receiveTimedEffects & checkNumberOfEffects
+end
 
+function checkNumberOfEffects()
+    if timedEffectsList == nil then return end
+    numberOfEffects = #(timedEffectsList)
+    print("displaying "..numberOfEffects.." timed events")
+    if numberOfEffects == 0 then return end
+    UI.setAttribute(displayTimedEffectsTextID, "active", "true")
+    threeViewed = {1,2,3} -- indexes of viewed effects
+    if numberOfEffects > 3 then -- have to choose 3 based on the buttons
+        UI.setAttribute(timedEffectsUpID, "active", "true")
+        UI.setAttribute(timedEffectsDownID, "active", "true")
+    end
+    refresh3TimedEffects() 
+end
+
+function timedEffectsUp()
+    local firstEffectNum = threeViewed[1]
+    local secondEffectNum = threeViewed[2]
+    local thirdEffectNum = threeViewed[3]
+
+    if thirdEffectNum == numberOfEffects then
+        threeViewed = {secondEffectNum, thirdEffectNum, 1}
+    else
+        if secondEffectNum == numberOfEffects then
+            threeViewed = {secondEffectNum, 1, 2}
+        else
+            if firstEffectNum == numberOfEffects then -- full reset
+                threeViewed = {1,2,3}
+            else -- regular case
+                threeViewed = {firstEffectNum + 1, secondEffectNum + 1, thirdEffectNum + 1}
+            end
+        end
+    end
+
+    refresh3TimedEffects()
+end
+
+function timedEffectsDown()
+    local firstEffectNum = threeViewed[1]
+    local secondEffectNum = threeViewed[2]
+    local thirdEffectNum = threeViewed[3]
+
+    if firstEffectNum == 1 then -- 1,2,3, max = 5
+        threeViewed = {numberOfEffects, 1, 2}
+    else
+        if secondEffectNum == 1 then
+            threeViewed = {numberOfEffects - 1, numberOfEffects, 1}
+        else
+            if thirdEffectNum == 1 then
+                threeViewed = {numberOfEffects - 2, numberOfEffects - 1, numberOfEffects}
+            else -- regular case
+                threeViewed = {firstEffectNum - 1, secondEffectNum - 1, thirdEffectNum - 1}
+            end
+        end
+    end
+
+    refresh3TimedEffects()
+end
+
+function refresh3TimedEffects()
+    local first = threeViewed[1]
+    local second = threeViewed[2]
+    local third = threeViewed[3]
+
+    if numberOfEffects >= 1 then
+        UI.setAttribute(timedEffect1ID, "active", "true")
+        local timedEffect1 = timedEffectsList[first]
+        local firstText = timedEffect1.Name..": "..timedEffect1.Effect.."\nTargets: "..timedEffect1.Targets.."\nRounds left: "..timedEffect1.RoundsLeft
+        UI.setAttribute(timedEffect1ID, "text", firstText)
+    end
+    if numberOfEffects >= 2 then
+        UI.setAttribute(timedEffect2ID, "active", "true")
+        local timedEffect2 = timedEffectsList[second]
+        local secondText = timedEffect2.Name..": "..timedEffect2.Effect.."\nTargets: "..timedEffect2.Targets.."\nRounds left: "..timedEffect2.RoundsLeft
+        UI.setAttribute(timedEffect2ID, "text", secondText)
+    end
+    if numberOfEffects >= 3 then
+        UI.setAttribute(timedEffect3ID, "active", "true")
+        local timedEffect3 = timedEffectsList[third]
+        local thirdText = timedEffect3.Name..": "..timedEffect3.Effect.."\nTargets: "..timedEffect3.Targets.."\nRounds left: "..timedEffect3.RoundsLeft
+        UI.setAttribute(timedEffect3ID, "text", thirdText)
+    end
+end
+
+
+
+function closeTimedEffects()
+    timedEffectsList = {}
+    UI.setAttribute(timedEffectsUpID, "active", "false")
+    UI.setAttribute(timedEffectsDownID, "active", "false")
+    UI.setAttribute(timedEffect1ID, "active", "false")
+    UI.setAttribute(timedEffect2ID, "active", "false")
+    UI.setAttribute(timedEffect3ID, "active", "false")
+    UI.setAttribute(displayTimedEffectsTextID, "active", "false")
 end
 
 -- API functions:
@@ -715,17 +848,18 @@ function apiGetTimedEffects()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_TIMED_EFFECTS_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
+        print("request done")
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
         else
-            print(request.text)
+            receiveTimedEffects(request.text) -- simply store as a list
+            checkNumberOfEffects() -- will populate the textButtons
         end
     end)
 end
 
 function apiAddTimedEffect(timedEffectList, pColor)
-    local success = false
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TIMED_EFFECT_PATH
     -- print("url: " .. url)
     WebRequest.post(url, timedEffectList, function(request)
@@ -733,11 +867,9 @@ function apiAddTimedEffect(timedEffectList, pColor)
             -- print("color: "..pColor)
             broadcastToColor("Unable to add timed effect.", pColor)
         else
-            success = true
-            print(request.text)
+            broadcastToColor("Added timed effect:\n"..timedEffectList, pColor)
         end
     end)
-    return success
 end
 
 function getCurrentPlayer()
@@ -875,10 +1007,24 @@ function cutOutCRtext(str)
     return str
 end
 
+function stringToList(stringToSearch) -- returns all values of the key (stringToFind) from the list (stringToSearch)
+    local foundValues = {}
+    stringStartPosition=1
+    while true do
+        local x,y=string.find(stringToSearch,"name",stringStartPosition,true)
+        if x==nil then break end
+        local startOfValue = y+4 -- get past the ":"
+        local endOfValue = y+10 -- todo!
+        print(string.sub(stringToSearch, startOfValue, endOfValue))
+        stringStartPosition=y+1 -- next loop, start just after the end of the string
+    end
+return foundValues
+end
+
 -- Object XML Utility functions:
 
 function setupObjectXmlUI()
-    objectGuid = "guid1234"-- getGUID()
+    objectGuid = "guid1234"-- getGUID() -- todo
     local newXML = replaceXmlGuid(XML_STRING, objectGuid)
     UI.setXml(newXML)
 end

@@ -67,7 +67,7 @@
         <Button id = "openPartySkillViewer" visibility = "host" color = "#cc0000" onClick="skillPopupToggle" position = "850 -200 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Party Skill Viewer</Button>
     </Panel>
 
-    <Panel id = "timedEffectsPanel">
+    <Panel id = "timedEffectsCreationPanel">
         <!-- add timed effect (all, combat only) Name, Targets, & time left -->
         <Button id = "add_timed_effect" position = "850 -400 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
         <Button id = "text_button_6" position = "0 -80 0" width = "300" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Enter an effect:</Button>
@@ -77,6 +77,15 @@
         <InputField id = "timed_effect_duration" visibility = "host" onEndEdit = "addTimedEffectDuration" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -240 0" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
         <Button id = "confirm_timed_effect" visibility = "host" position = "-50 -280 0" width = "80" height = "32" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Create</Button>
         <Button id = "cancel_timed_effect" visibility = "host" position = "50 -280 0" width = "80" height = "32" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Cancel</Button>
+    </Panel>
+
+    <Panel id = "timedEffectsDisplayPanel">
+            <Button id = "text_button_7" position = "-200 -75 0" width = "160" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Current Effects:</Button>
+            <Button id = "text_button_8" position = "-200 -140 0" width = "300" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 1 here</Button>
+            <Button id = "text_button_9" position = "-200 -220 0" width = "300" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 2 here</Button>
+            <Button id = "text_button_10" position = "-200 -300 0" width = "300" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 3 here</Button>
+            <Button id = "timed_effects_up_button" position = "-310 -75 0" width = "30" height = "40" color = "#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsUp">↑</Button>
+            <Button id = "timed_effects_down_button" position = "-90 -75 0" width = "30" height = "40" color = "#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsDown">↓</Button>
 
     </Panel>
 </Panel>
