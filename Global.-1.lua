@@ -135,6 +135,7 @@ fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
+    -- replaceXmlGuid(XML_STRING, "12345") -- testing only
 end
 
 function onUpdate()
@@ -1253,6 +1254,178 @@ end
 --         local foundElement = getElementById(table, id)
 --         if foundElement != nil then 
 --             return foundElement
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
 --         end
 --     end
 --     return nil
