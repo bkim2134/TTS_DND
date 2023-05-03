@@ -45,8 +45,6 @@ whiteInitiativeID = "whiteInitiative"
 gmInitiativeID = "gm_roll_initiative"
 gmInitTextID = "text_button_2"
 turnOrderID = "h_scrollView"
--- currentPlayerID = "text_button_3"
--- nextPlayerID = "text_button_4"
 endTurnID = "end_turn_button"
 endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
@@ -87,6 +85,26 @@ initSlot4ID = "text_button_13"
 initSlot5ID = "text_button_14"
 turnLeftButtonID = "turn_left_button"
 turnRightButtonID = "turn_right_button"
+closeBlueInitID = "closeBlueInit"
+closeBlueSkillID = "closeBlueSkill"
+closeWhiteInitID = "closeWhiteInit"
+closeWhiteSkillID = "closeWhiteSkill"
+closeGreenInitID = "closeGreenInit"
+closeGreenSkillID = "closeGreenSkill"
+closeRedInitID = "closeRedInit"
+closeRedSkillID = "closeRedSkill"
+closeTealInitID = "closeTealInit"
+closeTealSkillID = "closeTealSkill"
+closeBrownInitID = "closeBrownInit"
+closeBrownSkillID = "closeBrownSkill"
+closeYellowInitID = "closeYellowInit"
+closeYellowSkillID = "closeYellowSkill"
+closeOrangeInitID = "closeOrangeInit"
+closeOrangeSkillID = "closeOrangeSkill"
+closePinkInitID = "closePinkInit"
+closePinkSkillID = "closePinkSkill"
+closePurpleInitID = "closePurpleInit"
+closePurpleSkillID = "closePurpleSkill"
 
 -- Game constants:
 
@@ -327,7 +345,8 @@ function requestInitiative()
     broadcastToAll("It\'s time to roll initiative!")
     -- for each color, if a PC, activate that UI element to request init
     if isNotEmpty(playerColorMap.White) then
-        UI.setAttribute(whiteInitiativeID, "active", "true")
+        UI.setAttribute(whiteInitiativeID, "active", "true") -- todo: activate buttons too
+
     end
     if isNotEmpty(playerColorMap.Red) then
         UI.setAttribute(redInitiativeID, "active", "true")
@@ -360,10 +379,9 @@ function requestInitiative()
 end
 
 function addPlayerInitiative(player, initTotal, id)
-    UI.setAttribute(id, "active", "false")
-    name01 = findPlayerNameFromColor(player.color)
-    -- print(name01)
-    addNameToGMPopup(name01, initTotal)
+    UI.setAttribute(id, "active", "false") -- todo: activate color buttons
+
+    addNameToGMPopup(findPlayerNameFromColor(player.color), initTotal)
 end
 
 function addNameToGMPopup(pName, initiativeTotal)
@@ -400,8 +418,6 @@ function endCombat()
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
     UI.setAttribute(refreshCombatID, "active", "false")
-    -- UI.setAttribute(currentPlayerID, "active", "false")
-    -- UI.setAttribute(nextPlayerID, "active", "false")
     UI.setAttribute(addTimedEffectID, "active", "false")
     closeTimedEffects()
     closeTurnOrder()
@@ -421,7 +437,7 @@ function requestPartySkillCheck()
     broadcastToAll("It\'s time for a skill check!")
     -- for each color, if a PC, activate that UI element to request skill
     if isNotEmpty(playerColorMap.White) then
-        UI.setAttribute(whiteSkillID, "active", "true")
+        UI.setAttribute(whiteSkillID, "active", "true") -- todo add buttons
     end
     if isNotEmpty(playerColorMap.Red) then
         UI.setAttribute(redSkillID, "active", "true")
@@ -528,8 +544,6 @@ function announceTurn(currPlayer)
     end
     currentTurnName = currPlayer
     broadcastToAll("It\'s your turn, "..currentTurnName.."!")
-    -- UI.setAttribute(currentPlayerID, "active", "true")
-    -- UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
 
     noMatch = false
     if playerColorMap.White == currentTurnName then
@@ -1226,7 +1240,7 @@ end
 -- Object XML Utility functions:
 
 function setupObjectXmlUI()
-    objectGuid = "guid1234"-- getGUID() -- todo
+    objectGuid = "guid1234"-- getGUID() -- todo  fix guid placeholder???
     local newXML = replaceXmlGuid(XML_STRING, objectGuid)
     UI.setXml(newXML)
 end

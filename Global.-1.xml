@@ -66,7 +66,6 @@
     </Panel>
 
     <Panel id = "timedEffectsCreationPanel">
-        <!-- add timed effect (all, combat only) Name, Targets, & time left -->
         <Button id = "add_timed_effect" position = "850 -400 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
         <Button id = "text_button_6" position = "0 -80 0" width = "300" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Enter an effect:</Button>
         <InputField id = "timed_effect_name" visibility = "host" onEndEdit = "addTimedEffectName" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -120 0" placeholder = "Effect name:" fontStyle = "bold"></InputField>
