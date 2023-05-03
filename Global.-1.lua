@@ -4,10 +4,8 @@
 
 -- XML variables: 
 
-isTabletopObject = false -- set to true for objects
 XML_STRING = [[
-<XML id = "test" onCLick = "guidPlaceholder/foo">
-<XML>
+<Panel id = "test" onCLick = "foo">Test</Panel>
 ]]
 
 -- Network constants:
@@ -132,6 +130,8 @@ BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
 CR_STRING = [[%pCR%s]]
 CR_STRING_2 = [[%p%d]]
+XML_REPLACE = [[onClick%s=%s"]]
+XML_REPLACE_2 = [[onEndEdit%s=%s"]] -- todo: update this with %p and maybe %c
 -- ATTRIBUTES = "attributes"
 -- ID = "id"
 -- CHILDREN = "children"
@@ -153,9 +153,6 @@ fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
-    if isTabletopObject then
-        setupObjectXmlUI()
-    end
 end
 
 function onUpdate()
@@ -1239,17 +1236,23 @@ end
 
 -- Object XML Utility functions:
 
+function onObjectSpawn(object)
+    objectGuid = object.getGUID()
+    print("GUID: "..objectGuid)
+    isTabletopObject = true
+    setupObjectXmlUI()
+end
+
 function setupObjectXmlUI()
-    objectGuid = "guid1234"-- getGUID() -- todo  fix guid placeholder???
     local newXML = replaceXmlGuid(XML_STRING, objectGuid)
     UI.setXml(newXML)
 end
 
 function replaceXmlGuid(xml, guid)
-    -- print("XML: "..xml)
-    -- print("GUID: "..guid)
-    xml = xml:gsub("guidPlaceholder", guid)
-    -- print("New XML: "..xml)
+    print("XML: "..xml)
+    xml = xml:gsub(XML_REPLACE, [[onClick = "]]..guid..[[/]]) -- replace onClick = "
+    xml = xml:gsub(XML_REPLACE_2, [[onEndEdit = "]]..guid..[[/]]) -- replace onEndEdit = "
+    print("New XML: "..xml)
     return xml
 end
 
