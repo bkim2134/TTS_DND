@@ -2,10 +2,10 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
--- XML variables: 
+-- XML variable (copy Global.-1.xml into this string):
 
 XML_STRING = [[
-<Panel id = "test" onCLick = "foo">Test</Panel>
+<Panel id = "test" onClick = "foo" onSubmit = "foo2" onEndEdit = "foo3">Test</Panel>
 ]]
 
 -- Network constants:
@@ -83,26 +83,7 @@ initSlot4ID = "text_button_13"
 initSlot5ID = "text_button_14"
 turnLeftButtonID = "turn_left_button"
 turnRightButtonID = "turn_right_button"
-closeBlueInitID = "closeBlueInit"
-closeBlueSkillID = "closeBlueSkill"
-closeWhiteInitID = "closeWhiteInit"
-closeWhiteSkillID = "closeWhiteSkill"
-closeGreenInitID = "closeGreenInit"
-closeGreenSkillID = "closeGreenSkill"
-closeRedInitID = "closeRedInit"
-closeRedSkillID = "closeRedSkill"
-closeTealInitID = "closeTealInit"
-closeTealSkillID = "closeTealSkill"
-closeBrownInitID = "closeBrownInit"
-closeBrownSkillID = "closeBrownSkill"
-closeYellowInitID = "closeYellowInit"
-closeYellowSkillID = "closeYellowSkill"
-closeOrangeInitID = "closeOrangeInit"
-closeOrangeSkillID = "closeOrangeSkill"
-closePinkInitID = "closePinkInit"
-closePinkSkillID = "closePinkSkill"
-closePurpleInitID = "closePurpleInit"
-closePurpleSkillID = "closePurpleSkill"
+ipSelectorPanelID = "ipSelectorPanel"
 
 -- Game constants:
 
@@ -131,7 +112,8 @@ BUTTON_COLOR_12 = "#bdbdbd"
 CR_STRING = [[%pCR%s]]
 CR_STRING_2 = [[%p%d]]
 XML_REPLACE = [[onClick%s=%s"]]
-XML_REPLACE_2 = [[onEndEdit%s=%s"]] -- todo: update this with %p and maybe %c
+XML_REPLACE_2 = [[onEndEdit%s=%s"]]
+XML_REPLACE_3 = [[onSubmit%s=%s"]]
 -- ATTRIBUTES = "attributes"
 -- ID = "id"
 -- CHILDREN = "children"
@@ -168,6 +150,7 @@ function storeIPAddress(player, ipAddress, id)
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
     UI.setAttribute(changeIPAddressID, "text", IP_ADDRESS)
+    UI.setAttribute(ipSelectorPanelID, "height", "70")
     loadPlayerData()
 end
 
@@ -175,6 +158,8 @@ function changeIPAddress()
     UI.setAttribute(inputIPAddressID, "active", "true")
     UI.setAttribute(inputIPAddressID, "visibility", "host")
     UI.setAttribute(changeIPAddressID, "active", "false")
+    UI.setAttribute(addAPlayerID, "active", "false")
+    UI.setAttribute(ipSelectorPanelID, "height", "30")
 end
 
 -- Player selection functions:
@@ -342,7 +327,7 @@ function requestInitiative()
     broadcastToAll("It\'s time to roll initiative!")
     -- for each color, if a PC, activate that UI element to request init
     if isNotEmpty(playerColorMap.White) then
-        UI.setAttribute(whiteInitiativeID, "active", "true") -- todo: activate buttons too
+        UI.setAttribute(whiteInitiativeID, "active", "true")
 
     end
     if isNotEmpty(playerColorMap.Red) then
@@ -376,7 +361,7 @@ function requestInitiative()
 end
 
 function addPlayerInitiative(player, initTotal, id)
-    UI.setAttribute(id, "active", "false") -- todo: activate color buttons
+    UI.setAttribute(id, "active", "false")
 
     addNameToGMPopup(findPlayerNameFromColor(player.color), initTotal)
 end
@@ -434,7 +419,7 @@ function requestPartySkillCheck()
     broadcastToAll("It\'s time for a skill check!")
     -- for each color, if a PC, activate that UI element to request skill
     if isNotEmpty(playerColorMap.White) then
-        UI.setAttribute(whiteSkillID, "active", "true") -- todo add buttons
+        UI.setAttribute(whiteSkillID, "active", "true")
     end
     if isNotEmpty(playerColorMap.Red) then
         UI.setAttribute(redSkillID, "active", "true")
@@ -1249,9 +1234,10 @@ function setupObjectXmlUI()
 end
 
 function replaceXmlGuid(xml, guid)
-    print("XML: "..xml)
+    print("Old XML: "..xml)
     xml = xml:gsub(XML_REPLACE, [[onClick = "]]..guid..[[/]]) -- replace onClick = "
     xml = xml:gsub(XML_REPLACE_2, [[onEndEdit = "]]..guid..[[/]]) -- replace onEndEdit = "
+    xml = xml:gsub(XML_REPLACE_3, [[onSubmit = "]]..guid..[[/]]) -- replace onSubmit = "
     print("New XML: "..xml)
     return xml
 end

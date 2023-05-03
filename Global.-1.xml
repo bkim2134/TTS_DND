@@ -1,12 +1,18 @@
-<Panel id = "superPanel">
-    <Panel id = "ipSelectorPanel" position = "590 516 0">
-        <InputField id = "ipaddress_input" visibility = "host" onEndEdit = "storeIPAddress"  placeholder = "Input server address:" allowDragging = "true" returnToOriginalPositionWhenReleased = "false"></InputField>
-        <Button id = "change_ipaddress" visibility = "host" active = "false" onClick="changeIPAddress" width = "160" height = "30" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Change server address</Button>
-    </Panel>
+<!-- XML for Tabletop Simulator Connector for D&D Combat Assistant -->
+<!-- For GUID replacement, make sure you follow this convention for any function names (note the spaces): onClick = "functionName" -->
 
-    <Panel id = "playerSelectorPanel">
-        <Button id = "text_button" position = "0 330 0" width = "700" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
-        <GridLayout id = "pc_list" childAlignment = "upperCenter" padding = "250 250 250 250" spacing = "20 10" cellSize = "300 75" active = "false">
+<Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-288 -10" width = "160" height = "30" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <VerticalLayout spacing = "10">
+        <InputField id = "ipaddress_input" visibility = "host" onSubmit = "storeIPAddress" placeholder = "Input server address:"></InputField>
+        <Button id = "change_ipaddress" visibility = "host" active = "false" onClick = "changeIPAddress">Change server address</Button>
+        <Button id = "addAPlayer" visibility = "host" color = "#cc0000" onClick = "addPlayerToggle" active = "false">Close Player Selector</Button>
+    </VerticalLayout>
+</Panel>
+
+<Panel id = "playerSelectorPanel" width = "1000" height = "400" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <VerticalLayout childForceExpandHeight = "false">
+        <Button id = "text_button" minHeight = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
+        <GridLayout id = "pc_list" padding = "30 0 20 0" spacing = "20 10" cellSize = "300 75" active = "false">
             <Button id = "buttonId1" onClick = "playerSelected(Button One)" color = "#99ccff" fontStyle = "bold" fontSize = "16px" active = "false">Button One</Button>
             <Button id = "buttonId2" onClick = "playerSelected(Button Two)" color = "#3399ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Two</Button>
             <Button id = "buttonId3" onClick = "playerSelected(Button Three)" color = "#ff99ff" fontStyle = "bold" fontSize = "16px" active = "false">Button Three</Button>
@@ -20,82 +26,82 @@
             <Button id = "buttonId11" onClick = "playerSelected(Button Eleven)" color = "#ebebeb" fontStyle = "bold" fontSize = "16px" active = "false">Button Eleven</Button>
             <Button id = "buttonId12" onClick = "playerSelected(Button Twelve)" color = "#bdbdbd" fontStyle = "bold" fontSize = "16px" active = "false">Button Twelve</Button>
         </GridLayout>
-        <Button id = "addAPlayer" visibility = "host" color = "#cc0000" onClick="addPlayerToggle" position = "590 480 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Player Selector</Button>
-    </Panel>
-
-    <Panel id = "initiativeEntryPanel">
-        <Button id = "requestInit" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="requestInitiative" position = "850 150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
-        <InputField id = "blueInitiative" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "purpleInitiative" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "greenInitiative" visibility = "green" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "orangeInitiative" visibility = "orange" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "tealInitiative" visibility = "teal" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "brownInitiative" visibility = "brown" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "pinkInitiative" visibility = "pink" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "redInitiative" visibility = "red" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "yellowInitiative" visibility = "yellow" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-        <InputField id = "whiteInitiative" visibility = "white" onEndEdit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
-    </Panel>
-
-    <Panel id = "gmInitPanel">
-        <Button id = "text_button_2" visibility = "host" position = "650 -262 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
-        <Button id = "gm_roll_initiative" visibility = "host" position = "650 -335 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
-    </Panel>
-
-    <Panel id = "endTurnPanel">
-        <Button id = "end_turn_button" position = "0 -400 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-        <Button id = "end_turn_gm" visibility = "host" position = "850 0 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Current Turn</Button>
-        <Button id = "end_combat_gm" visibility = "host" position = "850 -75 0" width = "200" height = "60" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "endCombat">End Combat</Button>
-        <Button id = "refresh_combat_gm" visibility = "host" position = "850 75 0" width = "200" height = "60" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "setUpTurnOrder">Refresh Current Players</Button>
-    </Panel>
-
-    <Panel id = "partySkillPanel">
-        <Button id = "requestPartySkill" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="requestPartySkillCheck" position = "850 -150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
-        <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onEndEdit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "greenSkill" visibility = "green" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "orangeSkill" visibility = "orange" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "tealSkill" visibility = "teal" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "brownSkill" visibility = "brown" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "pinkSkill" visibility = "pink" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "redSkill" visibility = "red" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "yellowSkill" visibility = "yellow" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <InputField id = "whiteSkill" visibility = "white" onEndEdit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-        <Button id = "text_button_5" position = "600 -12 0" width = "250" height = "400" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
-        <Button id = "openPartySkillViewer" visibility = "host" color = "#cc0000" onClick="skillPopupToggle" position = "850 -200 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Party Skill Viewer</Button>
-    </Panel>
-
-    <Panel id = "timedEffectsCreationPanel">
-        <Button id = "add_timed_effect" position = "850 -400 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
-        <Button id = "text_button_6" position = "0 -80 0" width = "300" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Enter an effect:</Button>
-        <InputField id = "timed_effect_name" visibility = "host" onEndEdit = "addTimedEffectName" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -120 0" placeholder = "Effect name:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_effect" visibility = "host" onEndEdit = "addTimedEffectEffect" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -160 0" placeholder = "Effect:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_targets" visibility = "host" onEndEdit = "addTimedEffectTargets" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -200 0" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_duration" visibility = "host" onEndEdit = "addTimedEffectDuration" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -240 0" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
-        <Button id = "confirm_timed_effect" visibility = "host" position = "-50 -280 0" width = "80" height = "32" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Create</Button>
-        <Button id = "cancel_timed_effect" visibility = "host" position = "50 -280 0" width = "80" height = "32" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Cancel</Button>
-    </Panel>
-
-    <Panel id = "timedEffectsDisplayPanel">
-            <Button id = "text_button_7" position = "-200 -75 0" width = "160" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Current Effects (0):</Button>
-            <Button id = "text_button_8" position = "-200 -140 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 1 here</Button>
-            <Button id = "text_button_9" position = "-200 -220 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 2 here</Button>
-            <Button id = "text_button_10" position = "-200 -300 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 3 here</Button>
-            <Button id = "timed_effects_up_button" position = "-310 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsUp">↑</Button>
-            <Button id = "timed_effects_down_button" position = "-90 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsDown">↓</Button>
-    </Panel>
-
-    <Panel id = "initiativeOrderPanel">
-        <Button id = "text_button_3" position = "-450 100 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1">Initiatve Order (0 characters):</Button>
-        <Button id = "text_button_4" position = "-400 20 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 1</Button>
-        <Button id = "text_button_11" position = "-400 -60 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 2</Button>
-        <Button id = "text_button_12" position = "-400 -140 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 3</Button>
-        <Button id = "text_button_13" position = "-400 -220 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 4</Button>
-        <Button id = "text_button_14" position = "-400 -300 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 5</Button>
-        <Button id = "turn_left_button" position = "-410 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "turnOrderLeft">←</Button>
-        <Button id = "turn_right_button" position = "-190 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "turnOrderRight">→</Button>
-    </Panel>
+    </VerticalLayout>
 </Panel>
+
+<Panel id = "initiativeEntryPanel">
+    <Button id = "requestInit" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick = "requestInitiative" position = "850 150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
+    <InputField id = "blueInitiative" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "purpleInitiative" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerInitiative" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "greenInitiative" visibility = "green" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "orangeInitiative" visibility = "orange" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "tealInitiative" visibility = "teal" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "brownInitiative" visibility = "brown" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "pinkInitiative" visibility = "pink" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "redInitiative" visibility = "red" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "yellowInitiative" visibility = "yellow" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+    <InputField id = "whiteInitiative" visibility = "white" onSubmit = "addPlayerInitiative" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 0 0" placeholder = "Enter initiative total:"></InputField>
+</Panel>
+
+<Panel id = "gmInitPanel">
+    <Button id = "text_button_2" visibility = "host" position = "650 -262 0" width = "600" height = "80" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">GM initiative list here</Button>
+    <Button id = "gm_roll_initiative" visibility = "host" position = "650 -335 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Roll new initiative!</Button>
+</Panel>
+
+<Panel id = "endTurnPanel">
+    <Button id = "end_turn_button" position = "0 -400 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
+    <Button id = "end_turn_gm" visibility = "host" position = "850 0 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Current Turn</Button>
+    <Button id = "end_combat_gm" visibility = "host" position = "850 -75 0" width = "200" height = "60" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "endCombat">End Combat</Button>
+    <Button id = "refresh_combat_gm" visibility = "host" position = "850 75 0" width = "200" height = "60" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "setUpTurnOrder">Refresh Current Players</Button>
+</Panel>
+
+<Panel id = "partySkillPanel">
+    <Button id = "requestPartySkill" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" active = "false" onClick="requestPartySkillCheck" position = "850 -150 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
+    <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "greenSkill" visibility = "green" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "orangeSkill" visibility = "orange" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "tealSkill" visibility = "teal" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "brownSkill" visibility = "brown" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "pinkSkill" visibility = "pink" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "redSkill" visibility = "red" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "yellowSkill" visibility = "yellow" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <Button id = "text_button_5" position = "600 -12 0" width = "250" height = "400" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+    <Button id = "openPartySkillViewer" visibility = "host" color = "#cc0000" onClick="skillPopupToggle" position = "850 -200 0" width = "160" height = "30" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Close Party Skill Viewer</Button>
+</Panel>
+
+<Panel id = "timedEffectsCreationPanel">
+    <Button id = "add_timed_effect" position = "850 -400 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
+    <Button id = "text_button_6" position = "0 -80 0" width = "300" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Enter an effect:</Button>
+    <InputField id = "timed_effect_name" visibility = "host" onEndEdit = "addTimedEffectName" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -120 0" placeholder = "Effect name:" fontStyle = "bold"></InputField>
+    <InputField id = "timed_effect_effect" visibility = "host" onEndEdit = "addTimedEffectEffect" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -160 0" placeholder = "Effect:" fontStyle = "bold"></InputField>
+    <InputField id = "timed_effect_targets" visibility = "host" onEndEdit = "addTimedEffectTargets" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -200 0" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
+    <InputField id = "timed_effect_duration" visibility = "host" onEndEdit = "addTimedEffectDuration" width = "250" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -240 0" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
+    <Button id = "confirm_timed_effect" visibility = "host" position = "-50 -280 0" width = "80" height = "32" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Create</Button>
+    <Button id = "cancel_timed_effect" visibility = "host" position = "50 -280 0" width = "80" height = "32" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Cancel</Button>
+</Panel>
+
+<Panel id = "timedEffectsDisplayPanel">
+        <Button id = "text_button_7" position = "-200 -75 0" width = "160" height = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Current Effects (0):</Button>
+        <Button id = "text_button_8" position = "-200 -140 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 1 here</Button>
+        <Button id = "text_button_9" position = "-200 -220 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 2 here</Button>
+        <Button id = "text_button_10" position = "-200 -300 0" width = "300" height = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Timed effect 3 here</Button>
+        <Button id = "timed_effects_up_button" position = "-310 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsUp">↑</Button>
+        <Button id = "timed_effects_down_button" position = "-90 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onCLick = "timedEffectsDown">↓</Button>
+</Panel>
+
+<Panel id = "initiativeOrderPanel">
+    <Button id = "text_button_3" position = "-450 100 0" width = "350" height = "40" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1">Initiatve Order (0 characters):</Button>
+    <Button id = "text_button_4" position = "-400 20 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 1</Button>
+    <Button id = "text_button_11" position = "-400 -60 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 2</Button>
+    <Button id = "text_button_12" position = "-400 -140 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 3</Button>
+    <Button id = "text_button_13" position = "-400 -220 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 4</Button>
+    <Button id = "text_button_14" position = "-400 -300 0" width = "300" height = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Init slot 5</Button>
+    <Button id = "turn_left_button" position = "-410 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "turnOrderLeft">←</Button>
+    <Button id = "turn_right_button" position = "-190 -75 0" width = "30" height = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "turnOrderRight">→</Button>
+</Panel>
+
 
 <!-- <Panel id = "recursionPanel">
     <Button onClick = "buildInitiativeRow" width = "160" height = "30">Print Chars</Button>
