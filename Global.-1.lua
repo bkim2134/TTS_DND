@@ -45,8 +45,8 @@ whiteInitiativeID = "whiteInitiative"
 gmInitiativeID = "gm_roll_initiative"
 gmInitTextID = "text_button_2"
 turnOrderID = "h_scrollView"
-currentPlayerID = "text_button_3"
-nextPlayerID = "text_button_4"
+-- currentPlayerID = "text_button_3"
+-- nextPlayerID = "text_button_4"
 endTurnID = "end_turn_button"
 endTurnGmID = "end_turn_gm"
 endCombatID = "end_combat_gm"
@@ -79,6 +79,14 @@ timedEffect2ID = "text_button_9"
 timedEffect3ID = "text_button_10"
 timedEffectsDownID = "timed_effects_down_button"
 timedEffectsUpID = "timed_effects_up_button"
+initTextID = "text_button_3"
+initSlot1ID = "text_button_4"
+initSlot2ID = "text_button_11"
+initSlot3ID = "text_button_12"
+initSlot4ID = "text_button_13"
+initSlot5ID = "text_button_14"
+turnLeftButtonID = "turn_left_button"
+turnRightButtonID = "turn_right_button"
 
 -- Game constants:
 
@@ -87,6 +95,10 @@ PROMPT_BLUE = "#3498DB"
 NPC_PURPLE = "#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULT_BLUE_GREY = "#5c7091"
+CURRENT_GOLD = "#ffcc00"
+NEXT_PURPLE = "#9900cc"
+END_RED = "#cc0000"
+BLACK = "#000000"
 DEFAULTY_GREY = "#d1d1d1"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
@@ -115,6 +127,9 @@ currentTurnName = ""
 nextTurnName = ""
 pcSelectorActive = false
 timedEffectsList = {}
+threeViewed = {1,2,3} -- indexes of viewed effects
+fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
+
 
 -- Core functions:
 
@@ -301,6 +316,8 @@ end
 function requestInitiative()
     endCombat()
     if  pcSelectorActive then
+        UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
+        UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE) -- double added to cover an error
         closePcSelector()
     end
     numberInitspopulated = 0
@@ -374,7 +391,7 @@ function rollGmInitiative()
     UI.setAttribute(gmInitiativeID, "active", "false")
     -- broadcastToAll("Rolling npcs...")
     apiRollInit()
-    displayTurnOrder()
+    setUpTurnOrder()
     UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
 end
 
@@ -383,16 +400,19 @@ function endCombat()
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
     UI.setAttribute(refreshCombatID, "active", "false")
-    UI.setAttribute(currentPlayerID, "active", "false")
-    UI.setAttribute(nextPlayerID, "active", "false")
+    -- UI.setAttribute(currentPlayerID, "active", "false")
+    -- UI.setAttribute(nextPlayerID, "active", "false")
     UI.setAttribute(addTimedEffectID, "active", "false")
     closeTimedEffects()
+    closeTurnOrder()
 end
 
 -- Party skill check functions:
 
 function requestPartySkillCheck()
     if  pcSelectorActive then
+        UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
+        UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE)
         closePcSelector()
     end
     skillNameList = ""
@@ -508,8 +528,8 @@ function announceTurn(currPlayer)
     end
     currentTurnName = currPlayer
     broadcastToAll("It\'s your turn, "..currentTurnName.."!")
-    UI.setAttribute(currentPlayerID, "active", "true")
-    UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
+    -- UI.setAttribute(currentPlayerID, "active", "true")
+    -- UI.setAttribute(currentPlayerID, "text", "Current Turn: "..currentTurnName)
 
     noMatch = false
     if playerColorMap.White == currentTurnName then
@@ -565,27 +585,214 @@ function setNextTurn(nextPlayer)
         nextPlayer = cutOutCRtext(nextPlayer)
     end
     nextTurnName = nextPlayer
-    UI.setAttribute(nextPlayerID, "active", "true")
-    UI.setAttribute(nextPlayerID, "text", "Next Turn: "..nextTurnName)
+
+    displayTurnOrder() -- performs api call
+    displayTimedEffects() -- perfmors api call
 end
 
 function announceTime(currRound)
     print("The current time is: "..currRound)
-    apiGetInit()
-    displayTurnOrder() -- refresh on end turn
+    setUpTurnOrder() -- refresh on end turn
 end
 
-function displayTurnOrder()
-    -- refresh!
-    getCurrentPlayer()
-    getNextPlayer()    
-
-    displayTimedEffects()
+function setUpTurnOrder() 
+    doAPIrefresh() -- calls APIs in order
 
     UI.setAttribute(endTurnGmID, "active", "true")
     UI.setAttribute(endCombatID, "active", "true")
     UI.setAttribute(refreshCombatID, "active", "true")
     UI.setAttribute(addTimedEffectID, "active", "true")
+end
+
+function displayTurnOrder()
+    apiGetInit() -- populates initList
+end
+
+function receiveInitiativeStr(initiativeStr)
+    -- print("received: "..initiativeStr)
+    initiativeOrderList = {{Name="",Bloodied=false,Armor=0,Resistances="",Reactions=""}}
+    initiativeOrderList = getInitOrderListFromJsonStr(initiativeStr)
+end
+
+function getInitOrderListFromJsonStr(jsonStr)
+    local initList = {}
+    local responseBody = JSON.decode(jsonStr)
+    for i, v in pairs( responseBody ) do
+        local tempInitList = {Name="",Bloodied=false,Armor=0,Resistances="",Reactions=""}
+        local cName = responseBody[i]["name"]
+        if isCharacterNpc(cName) then
+            cName = cutOutCRtext(cName) -- remove "(CR x)" from name
+            if tonumber(responseBody[i]["hp"]) * 2 <= tonumber(responseBody[i]["hpMax"]) then
+                tempInitList.Bloodied = true
+            end
+        end
+        tempInitList.Name = cName
+        tempInitList.Armor = tonumber(responseBody[i]["ac"])
+        tempInitList.Resistances = responseBody[i]["resistances"]
+        tempInitList.Reactions = responseBody[i]["reactions"]
+        -- print(tempInitList.Effect)
+        table.insert(initList,tempInitList)
+        -- print(effectsList[i].Name)
+    end
+    return initList
+end
+
+function checkNumberOfInits()
+    if initiativeOrderList == nil then return end
+    numberOfPeopleInInitiative = #(initiativeOrderList)
+    print("displaying "..numberOfPeopleInInitiative.." characters in initiative order")
+    if numberOfPeopleInInitiative == 0 then return end
+    UI.setAttribute(initTextID, "active", "true")
+    UI.setAttribute(initTextID, "text", "Initiatve Order ("..numberOfPeopleInInitiative.." characters):")
+    getToCurrChar()
+    refresh5Inits() 
+end
+
+function getToCurrChar()
+    while true do
+        if isCurrChar(initiativeOrderList[fiveViewed[1]].Name) then return end
+        turnOrderLeft()
+    end
+end
+
+function turnOrderLeft()
+    local firstTurnNum = fiveViewed[1]
+    local secondTurnNum = fiveViewed[2]
+    local thirdTurnNum = fiveViewed[3]
+    local fourthTurnNum = fiveViewed[4]
+    local fifthTurnNum = fiveViewed[5]
+    -- print("left. fiveViewed numbers: "..firstTurnNum..","..secondTurnNum..","..thirdTurnNum..","..fourthTurnNum..","..fifthTurnNum)
+
+    if fifthTurnNum == numberOfPeopleInInitiative then
+        fiveViewed = {secondTurnNum, thirdTurnNum, fourthTurnNum, fifthTurnNum, 1}
+    else
+        if fourthTurnNum == numberOfPeopleInInitiative then
+            fiveViewed = {secondTurnNum, thirdTurnNum, fourthTurnNum, 1, 2}
+        else
+            if thirdTurnNum == numberOfPeopleInInitiative then
+                fiveViewed = {secondTurnNum, thirdTurnNum, 1, 2, 3}
+            else
+                if secondTurnNum == numberOfPeopleInInitiative then
+                    fiveViewed = {secondTurnNum, 1, 2, 3, 4}
+                else
+                    if firstTurnNum == numberOfPeopleInInitiative then
+                        fiveViewed = {1,2,3,4,5} -- full reset
+                    else
+                        fiveViewed = {firstTurnNum + 1, secondTurnNum + 1, thirdTurnNum + 1, fourthTurnNum + 1, fifthTurnNum + 1} -- regular case
+                    end
+                end
+            end
+        end
+    end
+
+    refresh5Inits()
+end
+
+function turnOrderRight()
+    local firstTurnNum = fiveViewed[1]
+    local secondTurnNum = fiveViewed[2]
+    local thirdTurnNum = fiveViewed[3]
+    local fourthTurnNum = fiveViewed[4]
+    local fifthTurnNum = fiveViewed[5]
+    print("right. fiveViewed numbers: "..firstTurnNum..","..secondTurnNum..","..thirdTurnNum..","..fourthTurnNum..","..fifthTurnNum)
+
+    if firstTurnNum == 1 then
+        fiveViewed = {numberOfPeopleInInitiative, 1, 2, 3, 4}
+    else
+        if secondTurnNum == 1 then
+            fiveViewed = {numberOfPeopleInInitiative - 1,numberOfPeopleInInitiative, 1, 2, 3}
+        else
+            if thirdTurnNum == 1 then
+                fiveViewed = {numberOfPeopleInInitiative - 2, numberOfPeopleInInitiative - 1, numberOfPeopleInInitiative, 1, 2}
+            else 
+                if fourthTurnNum == 1 then
+                    fiveViewed = {numberOfPeopleInInitiative - 3, numberOfPeopleInInitiative - 2, numberOfPeopleInInitiative - 1, numberOfPeopleInInitiative, 1}
+                else
+                    if fifthTurnNum == 1 then
+                        fiveViewed = {numberOfPeopleInInitiative - 4, numberOfPeopleInInitiative - 3, numberOfPeopleInInitiative - 2, numberOfPeopleInInitiative - 1, numberOfPeopleInInitiative}
+                    else
+                        fiveViewed = {firstTurnNum - 1, secondTurnNum - 1, thirdTurnNum - 1, fourthTurnNum - 1, fifthTurnNum - 1} -- regular case 
+                    end
+                end
+            end
+        end
+    end
+
+    refresh5Inits()
+end
+
+function refresh5Inits()
+    local first = fiveViewed[1]
+    local second = fiveViewed[2]
+    local third = fiveViewed[3]
+    local fourth = fiveViewed[4]
+    local fifth = fiveViewed[5]
+
+    if numberOfPeopleInInitiative >= 1 then
+        makeInitTextButton(initSlot1ID,initiativeOrderList[first])
+    end
+    if numberOfPeopleInInitiative >= 2 then
+        makeInitTextButton(initSlot2ID, initiativeOrderList[second])
+    end
+    if numberOfPeopleInInitiative >= 3 then
+        makeInitTextButton(initSlot3ID, initiativeOrderList[third])
+    end
+    if numberOfPeopleInInitiative >= 4 then
+        makeInitTextButton(initSlot4ID, initiativeOrderList[fourth])
+    end
+    if numberOfPeopleInInitiative >= 5 then
+        makeInitTextButton(initSlot5ID, initiativeOrderList[fifth])
+    end
+    if numberOfPeopleInInitiative > 5 then -- have to choose 5 based on the buttons
+        UI.setAttribute(turnLeftButtonID, "active", "true")
+        UI.setAttribute(turnRightButtonID, "active", "true")
+    else
+        UI.setAttribute(turnLeftButtonID, "active", "false")
+        UI.setAttribute(turnRightButtonID, "active", "false")
+    end
+end
+
+function makeInitTextButton(initSlotID, initChar)
+    -- print("activating "..initSlotID)
+    UI.setAttribute(initSlotID, "active", "true")
+    local charName = initChar.Name
+    -- print("name: "..charName)
+    UI.setAttribute(initSlotID, "text", charName)
+    -- print("setting color to DEFAULT_BLUE_GREY")
+    UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
+    if isCurrChar(charName) then
+        UI.setAttribute(initSlotID, "color", CURRENT_GOLD) -- color gold
+        -- print("setting color to CURRENT_GOLD")
+    else
+        if isNextChar(charName) then
+            UI.setAttribute(initSlotID, "color", NEXT_PURPLE) -- color purple
+            -- print("setting color to NEXT_PURPLE")
+        end
+    end
+    UI.setAttribute(initSlotID, "textColor", BLACK)
+    if initChar.Bloodied then
+        UI.setAttribute(initSlotID, "textColor", END_RED) -- red text
+    end
+end
+
+function isCurrChar(char01)
+    return currentTurnName == char01
+end
+
+function isNextChar(char02)
+    return nextTurnName == char02
+end
+
+function closeTurnOrder()
+    initiativeOrderList = {}
+    UI.setAttribute(turnRightButtonID, "active", "false")
+    UI.setAttribute(turnLeftButtonID, "active", "false")
+    UI.setAttribute(initSlot5ID, "active", "false")
+    UI.setAttribute(initSlot2ID, "active", "false")
+    UI.setAttribute(initSlot4ID, "active", "false")
+    UI.setAttribute(initSlot3ID, "active", "false")
+    UI.setAttribute(initSlot1ID, "active", "false")
+    UI.setAttribute(initTextID, "active", "false")
 end
 
 -- Timed Effect functions:
@@ -668,7 +875,7 @@ function confirmTimedEffect(player, id)
 end
 
 function receiveTimedEffects(timedEffectsStr)
-    print("received: "..timedEffectsStr)
+    -- print("received: "..timedEffectsStr)
     timedEffectsList = {{Name="",Effect="",Targets="",RoundsLeft=""}}
     timedEffectsList = getTimedEffectListFromJson(timedEffectsStr)
     -- print(timedEffectsList[1].Name)
@@ -700,11 +907,7 @@ function checkNumberOfEffects()
     print("displaying "..numberOfEffects.." timed events")
     if numberOfEffects == 0 then return end
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
-    threeViewed = {1,2,3} -- indexes of viewed effects
-    if numberOfEffects > 3 then -- have to choose 3 based on the buttons
-        UI.setAttribute(timedEffectsUpID, "active", "true")
-        UI.setAttribute(timedEffectsDownID, "active", "true")
-    end
+    UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
     refresh3TimedEffects() 
 end
 
@@ -712,6 +915,7 @@ function timedEffectsUp()
     local firstEffectNum = threeViewed[1]
     local secondEffectNum = threeViewed[2]
     local thirdEffectNum = threeViewed[3]
+    -- print("up. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum)
 
     if thirdEffectNum == numberOfEffects then
         threeViewed = {secondEffectNum, thirdEffectNum, 1}
@@ -734,8 +938,9 @@ function timedEffectsDown()
     local firstEffectNum = threeViewed[1]
     local secondEffectNum = threeViewed[2]
     local thirdEffectNum = threeViewed[3]
+    -- print("down. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum)
 
-    if firstEffectNum == 1 then -- 1,2,3, max = 5
+    if firstEffectNum == 1 then
         threeViewed = {numberOfEffects, 1, 2}
     else
         if secondEffectNum == 1 then
@@ -775,9 +980,14 @@ function refresh3TimedEffects()
         local thirdText = timedEffect3.Name..": "..timedEffect3.Effect.."\nTargets: "..timedEffect3.Targets.."\nRounds left: "..timedEffect3.RoundsLeft
         UI.setAttribute(timedEffect3ID, "text", thirdText)
     end
+    if numberOfEffects > 3 then -- have to choose 3 based on the buttons
+        UI.setAttribute(timedEffectsUpID, "active", "true")
+        UI.setAttribute(timedEffectsDownID, "active", "true")
+    else
+        UI.setAttribute(timedEffectsUpID, "active", "false")
+        UI.setAttribute(timedEffectsDownID, "active", "false")
+    end
 end
-
-
 
 function closeTimedEffects()
     timedEffectsList = {}
@@ -790,6 +1000,11 @@ function closeTimedEffects()
 end
 
 -- API functions:
+
+function doAPIrefresh()
+    getCurrentPlayer() -- announces turn & sets End Turn button
+    -- goes to call getNextPlayer(), whiich calls the disaply functions
+end
 
 function loadPlayerData()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_PCS_PATH
@@ -838,7 +1053,8 @@ function apiGetInit()
             print("error: " .. request.error)
             log(request.error)
         else
-            -- print(request.text)
+            receiveInitiativeStr(request.text) -- converts to list
+            checkNumberOfInits() -- populates the textButtons
         end
     end)
     
@@ -848,12 +1064,11 @@ function apiGetTimedEffects()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_TIMED_EFFECTS_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        print("request done")
         if request.is_error then
             print("error: " .. request.error)
             log(request.error)
         else
-            receiveTimedEffects(request.text) -- simply store as a list
+            receiveTimedEffects(request.text) -- convert to a list
             checkNumberOfEffects() -- will populate the textButtons
         end
     end)
@@ -881,6 +1096,7 @@ function getCurrentPlayer()
             log(request.error)
         else
             announceTurn(request.text);
+            getNextPlayer()
         end
     end)
 end
@@ -1005,20 +1221,6 @@ function cutOutCRtext(str)
     end
     -- print("non CR str: "..str)
     return str
-end
-
-function stringToList(stringToSearch) -- returns all values of the key (stringToFind) from the list (stringToSearch)
-    local foundValues = {}
-    stringStartPosition=1
-    while true do
-        local x,y=string.find(stringToSearch,"name",stringStartPosition,true)
-        if x==nil then break end
-        local startOfValue = y+4 -- get past the ":"
-        local endOfValue = y+10 -- todo!
-        print(string.sub(stringToSearch, startOfValue, endOfValue))
-        stringStartPosition=y+1 -- next loop, start just after the end of the string
-    end
-return foundValues
 end
 
 -- Object XML Utility functions:
