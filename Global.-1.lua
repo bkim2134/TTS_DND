@@ -1268,7 +1268,7 @@ end
 
 function onObjectSpawn(object)
     objectGuid = object.getGUID()
-    -- print("GUID: "..objectGuid)
+    print("GUID: "..objectGuid)
     isTabletopObject = true
     setupObjectXmlUI()
 end
