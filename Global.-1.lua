@@ -2,7 +2,7 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
--- XML variable (copy Global.-1.xml into this string):
+-- XML variable:
 
 XML_STRING = [[
 <Panel id = "test" onClick = "foo" onSubmit = "foo2" onEndEdit = "foo3">Test</Panel>
@@ -88,15 +88,16 @@ ipSelectorPanelID = "ipSelectorPanel"
 -- Game constants:
 
 SELECTED_GREY = "#787878"
-PROMPT_BLUE = "#3498DB"
+PROMPT_BLUE = "#0474bf"
 NPC_PURPLE = "#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULT_BLUE_GREY = "#5c7091"
-CURRENT_GOLD = "#ffcc00"
-NEXT_PURPLE = "#9900cc"
-END_RED = "#cc0000"
-BLACK = "#000000"
+BUTTON_TEXT_BLUE_GREY = "#83a2d4"
 DEFAULTY_GREY = "#d1d1d1"
+CURRENT_GOLD = "#ebb03b"
+BLOODIED_RED = "#8a0315"
+CABOOSE_RED = "#965959"
+BLACK = "#000000"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
 BUTTON_COLOR_3 = "#ff99ff"
@@ -127,8 +128,8 @@ currentTurnName = ""
 nextTurnName = ""
 pcSelectorActive = false
 timedEffectsList = {}
-threeViewed = {1,2,3} -- indexes of viewed effects
 fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
+threeViewed = {1,2,3} -- indexes of viewed effects
 
 
 -- Core functions:
@@ -480,7 +481,7 @@ function getSkillStatistics()
     end
 
     if #statsList < 2 then
-        return "Total: "..tostring(sum)
+        return "\nTotal: "..tostring(sum)
     end
 
     local mean = sum / #(statsList)
@@ -799,20 +800,21 @@ function makeInitTextButton(initSlotID, initChar)
     local charName = initChar.Name
     -- print("name: "..charName)
     UI.setAttribute(initSlotID, "text", charName)
-    -- print("setting color to DEFAULT_BLUE_GREY")
-    UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
+   
     if isCurrChar(charName) then
         UI.setAttribute(initSlotID, "color", CURRENT_GOLD) -- color gold
-        -- print("setting color to CURRENT_GOLD")
     else
         if isNextChar(charName) then
-            UI.setAttribute(initSlotID, "color", NEXT_PURPLE) -- color purple
-            -- print("setting color to NEXT_PURPLE")
+            UI.setAttribute(initSlotID, "color", NPC_PURPLE) -- color purple
+        else
+            --  print("setting color of initBox to DEFAULT_BLUE_GREY")
+            UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
         end
     end
-    UI.setAttribute(initSlotID, "textColor", BLACK)
     if initChar.Bloodied then
-        UI.setAttribute(initSlotID, "textColor", END_RED) -- red text
+        UI.setAttribute(initSlotID, "textColor", BLOODIED_RED) -- red text
+    else
+        UI.setAttribute(initSlotID, "textColor", BLACK)
     end
 end
 
@@ -953,6 +955,7 @@ function checkNumberOfEffects()
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
     UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
     setBlankTimedEffectsInactive()
+    threeViewed = {1,2,3}
     refresh3TimedEffects() 
 end
 
@@ -1016,31 +1019,50 @@ function refresh3TimedEffects()
     local second = threeViewed[2]
     local third = threeViewed[3]
 
-    if numberOfEffects >= 1 then
-        UI.setAttribute(timedEffect1ID, "active", "true")
-        local timedEffect1 = timedEffectsList[first]
-        local firstText = timedEffect1.Name..": "..timedEffect1.Effect.."\nTargets: "..timedEffect1.Targets.."\nRounds left: "..timedEffect1.RoundsLeft
-        UI.setAttribute(timedEffect1ID, "text", firstText)
-    end
-    if numberOfEffects >= 2 then
-        UI.setAttribute(timedEffect2ID, "active", "true")
-        local timedEffect2 = timedEffectsList[second]
-        local secondText = timedEffect2.Name..": "..timedEffect2.Effect.."\nTargets: "..timedEffect2.Targets.."\nRounds left: "..timedEffect2.RoundsLeft
-        UI.setAttribute(timedEffect2ID, "text", secondText)
-    end
-    if numberOfEffects >= 3 then
-        UI.setAttribute(timedEffect3ID, "active", "true")
-        local timedEffect3 = timedEffectsList[third]
-        local thirdText = timedEffect3.Name..": "..timedEffect3.Effect.."\nTargets: "..timedEffect3.Targets.."\nRounds left: "..timedEffect3.RoundsLeft
-        UI.setAttribute(timedEffect3ID, "text", thirdText)
-    end
+    -- printNestedTable(timedEffectsList)
+
     if numberOfEffects > 3 then -- have to choose 3 based on the buttons
+        cabooseList = timedEffectsList[numberOfEffects]
         UI.setAttribute(timedEffectsUpID, "active", "true")
         UI.setAttribute(timedEffectsDownID, "active", "true")
     else
+        cabooseList = nil
         UI.setAttribute(timedEffectsUpID, "active", "false")
         UI.setAttribute(timedEffectsDownID, "active", "false")
     end
+
+    if numberOfEffects >= 1 then
+        makeTimedEffectTextButton(timedEffect1ID, timedEffectsList[first])
+    end
+    if numberOfEffects >= 2 then
+        makeTimedEffectTextButton(timedEffect2ID, timedEffectsList[second])
+    end
+    if numberOfEffects >= 3 then
+        makeTimedEffectTextButton(timedEffect3ID, timedEffectsList[third])
+    end
+end
+
+function makeTimedEffectTextButton(timeEffectSlotID, tempTimedEffectList)
+    -- print("activating timed effect: "..timeEffectSlotID..", table = "..tostring(tempTimedEffectList))
+    UI.setAttribute(timeEffectSlotID, "active", "true")
+    local text = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect.."\nTargets: "..tempTimedEffectList.Targets.."\nRounds left: "..tempTimedEffectList.RoundsLeft
+    UI.setAttribute(timeEffectSlotID, "text", text)
+    if cabooseList == tempTimedEffectList and tempTimedEffectList ~= nil then -- caboose found
+        UI.setAttribute(timeEffectSlotID, "color", CABOOSE_RED)
+    else
+        UI.setAttribute(timeEffectSlotID, "color", DEFAULT_BLUE_GREY)
+    end
+end
+
+function printNestedTable(inputTable) -- for testing & debugging only
+    print("inputTable: "..tostring(inputTable))
+    if inputTable == nil or #(inputTable) == 0 then return end
+     for tableNum,tempTable in ipairs(inputTable) do
+        print("table "..tableNum..": "..tostring(tempTable))
+        for itemNum,item in pairs(tempTable) do
+            print("item "..itemNum..": "..item)
+        end
+     end
 end
 
 function closeTimedEffects()
@@ -1118,15 +1140,15 @@ function apiGetTimedEffects()
     end)
 end
 
-function apiAddTimedEffect(timedEffectList, pColor)
+function apiAddTimedEffect(timedEffectList01, pColor)
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TIMED_EFFECT_PATH
     -- print("url: " .. url)
-    WebRequest.post(url, timedEffectList, function(request)
+    WebRequest.post(url, timedEffectList01, function(request)
         if request.response_code > 399 then
             -- print("color: "..pColor)
             broadcastToColor("Unable to add timed effect.", pColor)
         else
-            broadcastToColor("Added timed effect:\n"..timedEffectList, pColor)
+            broadcastToColor("Added timed effect:\n"..timedEffectList01, pColor)
         end
     end)
 end
@@ -1268,7 +1290,7 @@ end
 
 function onObjectSpawn(object)
     objectGuid = object.getGUID()
-    print("GUID: "..objectGuid)
+    -- print("GUID: "..objectGuid)
     isTabletopObject = true
     setupObjectXmlUI()
 end
