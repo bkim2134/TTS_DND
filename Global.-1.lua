@@ -151,7 +151,7 @@ function storeIPAddress(player, ipAddress, id)
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
     UI.setAttribute(changeIPAddressID, "text", IP_ADDRESS)
-    UI.setAttribute(ipSelectorPanelID, "height", "70")
+    -- UI.setAttribute(ipSelectorPanelID, "height", "70")
     loadPlayerData()
 end
 
@@ -160,7 +160,7 @@ function changeIPAddress()
     UI.setAttribute(inputIPAddressID, "visibility", "host")
     UI.setAttribute(changeIPAddressID, "active", "false")
     UI.setAttribute(addAPlayerID, "active", "false")
-    UI.setAttribute(ipSelectorPanelID, "height", "30")
+    -- UI.setAttribute(ipSelectorPanelID, "height", "30")
 end
 
 -- Player selection functions:
