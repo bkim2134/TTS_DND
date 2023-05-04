@@ -60,14 +60,14 @@
 
 <Panel id = "independentButtonsPanel">
     <Button id = "end_turn_button" position = "0 -360 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-    <Button id = "text_button_5" position = "-765 -20 0" width = "250" height = "400" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+    <Button id = "text_button_5" position = "-790 -20 0" width = "200" height = "400" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
     <Button id = "add_timed_effect" position = "-790 213 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
 </Panel>
 
 <Panel id = "gmPartySkillPanel" rectAlignment = "MiddleRight" offsetXY = "-210 -120" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick="requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
-        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick="skillPopupToggle"  active = "false">Close Party Skill Viewer</Button>
+        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick = "requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
+        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick = "skillPopupToggle"  active = "false">Close Party Skill Viewer</Button>
     </VerticalLayout>
 </Panel>
 
@@ -101,9 +101,9 @@
 <Panel id = "timedEffectsDisplayPanel" rectAlignment = "UpperLeft" offsetXY = "70 -8" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
         <HorizontalLayout>
-            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsUp">↑</Button>
+            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "32" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsUp">↑</Button>
             <Button id = "text_button_7"  minWidth = "160" minHeight = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Current Effects (0):</Button>
-            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsDown">↓</Button>
+            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "32" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsDown">↓</Button>
         </HorizontalLayout>
         <Button id = "text_button_8" minWidth = "300" minHeight = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 1 here</Button>
         <Button id = "text_button_9" minWidth = "300" minHeight = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 2 here</Button>
