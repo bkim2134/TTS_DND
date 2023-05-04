@@ -1,20 +1,21 @@
 -- Object.lua: 
 -- 1) Copy Global.-1.lua into this file (below step 4).
+-- 2) Copy Global.-1.xml into XML_STRING.
 
 -- In tabletop:
--- 2) Copy the code below into the object's lua in the scripting editor.
--- 3) Save the object. I like to name it 'D&D Combat Assistant engine'.
--- 4) When you load in the object, it will load the D&D Combat Assistant.
+-- 3) Copy the code below into the object's lua in the scripting editor.
+-- 4) Save the object. I like to name it 'D&D Combat Assistant engine'.
+-- 5) When you load in the object, it will load the D&D Combat Assistant.
 
 
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
--- XML variable (copy Global.-1.xml into this string):
+-- XML variable:
 
 XML_STRING = [[
-    <Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-420 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+    <Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-440 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "10" childForceExpandHeight = "false" childForceExpandWidth = "false">
         <InputField id = "ipaddress_input" minWidth = "160" minHeight = "30" visibility = "host" onSubmit = "storeIPAddress" placeholder = "Input server address:"></InputField>
         <Button id = "change_ipaddress" minWidth = "160" minHeight = "30" visibility = "host" active = "false" onClick = "changeIPAddress">Change server address</Button>
@@ -22,7 +23,7 @@ XML_STRING = [[
     </VerticalLayout>
 </Panel>
 
-<Panel id = "playerSelectorPanel" width = "1000" height = "400" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "playerSelectorPanel" width = "1000" height = "400" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout childForceExpandHeight = "false">
         <Button id = "text_button" minHeight = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
         <GridLayout id = "pc_list" padding = "30 0 20 0" spacing = "20 10" cellSize = "300 75" active = "false">
@@ -64,17 +65,17 @@ XML_STRING = [[
     </VerticalLayout>
 </Panel>
 
-<Panel id = "gmInitViewPanel" rectAlignment = "MiddleRight" offsetXY = "-610 -220" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "gmInitViewPanel" rectAlignment = "MiddleRight" offsetXY = "-610 -220" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "10" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "text_button_2" minHeight = "80" minWidth = "600" visibility = "host" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false">GM initiative list here</Button>
-        <Button id = "gm_roll_initiative" minHeight = "40" minWidth = "200" visibility = "host" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative">Roll new initiative!</Button>
+        <Button id = "text_button_2" minHeight = "80" minWidth = "600" visibility = "host" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false">GM initiative list here</Button>
+        <Button id = "gm_roll_initiative" minHeight = "40" minWidth = "200" visibility = "host" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "rollGmInitiative">Roll new initiative!</Button>
     </VerticalLayout>
 </Panel>
 
 <Panel id = "independentButtonsPanel">
-    <Button id = "end_turn_button" position = "0 -360 0" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-    <Button id = "text_button_5" position = "-790 -20 0" width = "200" height = "400" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
-    <Button id = "add_timed_effect" position = "-790 213 0" width = "200" height = "50" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
+    <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 160" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
+    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+    <Button id = "add_timed_effect" rectAlignment = "MiddleLeft" offsetXY = "80 212" width = "200" height = "50" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
 </Panel>
 
 <Panel id = "gmPartySkillPanel" rectAlignment = "MiddleRight" offsetXY = "-210 -120" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
@@ -97,39 +98,39 @@ XML_STRING = [[
     <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
 </Panel>
 
-<Panel id = "timedEffectsCreationPanel" offsetXY = "-90 -80" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "timedEffectsCreationPanel" offsetXY = "-90 -80" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "text_button_6" minHeight = "32" minWidth = "180" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
+        <Button id = "text_button_6" minHeight = "32" minWidth = "180" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
         <InputField id = "timed_effect_name" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Effect name:" fontStyle = "bold"></InputField>
         <InputField id = "timed_effect_effect" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectEffect" active = "false" placeholder = "Effect:" fontStyle = "bold"></InputField>
         <InputField id = "timed_effect_targets" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectTargets" active = "false" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
         <InputField id = "timed_effect_duration" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectDuration" active = "false" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
         <HorizontalLayout>
-            <Button id = "confirm_timed_effect" minHeight = "32" minWidth = "80" visibility = "host" color = "#3498DB" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect">Create</Button>
+            <Button id = "confirm_timed_effect" minHeight = "32" minWidth = "80" visibility = "host" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect">Create</Button>
             <Button id = "cancel_timed_effect" minHeight = "32" minWidth = "80" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator">Cancel</Button>
         </HorizontalLayout>
     </VerticalLayout>
 </Panel>
 
-<Panel id = "timedEffectsDisplayPanel" rectAlignment = "UpperLeft" offsetXY = "70 -8" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "timedEffectsDisplayPanel" rectAlignment = "UpperLeft" offsetXY = "80 -8" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <HorizontalLayout>
-            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "32" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsUp">↑</Button>
-            <Button id = "text_button_7"  minWidth = "160" minHeight = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Current Effects (0):</Button>
-            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "32" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsDown">↓</Button>
+        <HorizontalLayout spacing = "4">
+            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsUp">↑</Button>
+            <Button id = "text_button_7"  minWidth = "160" minHeight = "32" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Current Effects (0):</Button>
+            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsDown">↓</Button>
         </HorizontalLayout>
-        <Button id = "text_button_8" minWidth = "300" minHeight = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 1 here</Button>
-        <Button id = "text_button_9" minWidth = "300" minHeight = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 2 here</Button>
-        <Button id = "text_button_10" minWidth = "300" minHeight = "80" colors = "#5c7091|#5c7091|#5c7091|#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 3 here</Button>
+        <Button id = "text_button_8" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 1 here</Button>
+        <Button id = "text_button_9" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 2 here</Button>
+        <Button id = "text_button_10" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 3 here</Button>
     </VerticalLayout>
 </Panel>
 
-<Panel id = "initiativeOrderPanel" rectAlignment = "LowerCenter" offsetXY = "-760 140" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "initiativeOrderPanel" rectAlignment = "LowerCenter" offsetXY = "-760 140" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
         <HorizontalLayout spacing = "50" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-            <Button id = "turn_left_button" minWidth = "50" minHeight = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false"  onClick = "turnOrderLeft">←</Button>
-            <Button id = "text_button_3" minWidth = "350" minHeight = "40" fontStyle = "bold" fontSize = "16px" active = "false" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1">Initiatve Order (0 characters):</Button>
-            <Button id = "turn_right_button" minWidth = "50" minHeight = "40" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "turnOrderRight">→</Button>
+            <Button id = "turn_left_button" minWidth = "50" minHeight = "40" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false"  onClick = "turnOrderLeft">←</Button>
+            <Button id = "text_button_3" minWidth = "350" minHeight = "40" fontStyle = "bold" fontSize = "16px" active = "false" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4">Initiatve Order (0 characters):</Button>
+            <Button id = "turn_right_button" minWidth = "50" minHeight = "40" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "turnOrderRight">→</Button>
         </HorizontalLayout>
         <HorizontalLayout spacing = "5">
             <Button id = "text_button_4" minWidth = "300" minHeight = "80" fontStyle = "bold" color = "#5c7091" fontSize = "16px" active = "false">Init slot 1</Button>
@@ -222,15 +223,16 @@ ipSelectorPanelID = "ipSelectorPanel"
 -- Game constants:
 
 SELECTED_GREY = "#787878"
-PROMPT_BLUE = "#3498DB"
+PROMPT_BLUE = "#0474bf"
 NPC_PURPLE = "#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULT_BLUE_GREY = "#5c7091"
-CURRENT_GOLD = "#ffcc00"
-NEXT_PURPLE = "#9900cc"
-END_RED = "#cc0000"
-BLACK = "#000000"
+BUTTON_TEXT_BLUE_GREY = "#83a2d4"
 DEFAULTY_GREY = "#d1d1d1"
+CURRENT_GOLD = "#ebb03b"
+BLOODIED_RED = "#8a0315"
+CABOOSE_RED = "#965959"
+BLACK = "#000000"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
 BUTTON_COLOR_3 = "#ff99ff"
@@ -261,8 +263,8 @@ currentTurnName = ""
 nextTurnName = ""
 pcSelectorActive = false
 timedEffectsList = {}
-threeViewed = {1,2,3} -- indexes of viewed effects
 fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
+threeViewed = {1,2,3} -- indexes of viewed effects
 
 
 -- Core functions:
@@ -614,7 +616,7 @@ function getSkillStatistics()
     end
 
     if #statsList < 2 then
-        return "Total: "..tostring(sum)
+        return "\nTotal: "..tostring(sum)
     end
 
     local mean = sum / #(statsList)
@@ -933,20 +935,21 @@ function makeInitTextButton(initSlotID, initChar)
     local charName = initChar.Name
     -- print("name: "..charName)
     UI.setAttribute(initSlotID, "text", charName)
-    -- print("setting color to DEFAULT_BLUE_GREY")
-    UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
+   
     if isCurrChar(charName) then
         UI.setAttribute(initSlotID, "color", CURRENT_GOLD) -- color gold
-        -- print("setting color to CURRENT_GOLD")
     else
         if isNextChar(charName) then
-            UI.setAttribute(initSlotID, "color", NEXT_PURPLE) -- color purple
-            -- print("setting color to NEXT_PURPLE")
+            UI.setAttribute(initSlotID, "color", NPC_PURPLE) -- color purple
+        else
+            --  print("setting color of initBox to DEFAULT_BLUE_GREY")
+            UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
         end
     end
-    UI.setAttribute(initSlotID, "textColor", BLACK)
     if initChar.Bloodied then
-        UI.setAttribute(initSlotID, "textColor", END_RED) -- red text
+        UI.setAttribute(initSlotID, "textColor", BLOODIED_RED) -- red text
+    else
+        UI.setAttribute(initSlotID, "textColor", BLACK)
     end
 end
 
@@ -1087,6 +1090,7 @@ function checkNumberOfEffects()
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
     UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
     setBlankTimedEffectsInactive()
+    threeViewed = {1,2,3}
     refresh3TimedEffects() 
 end
 
@@ -1150,31 +1154,50 @@ function refresh3TimedEffects()
     local second = threeViewed[2]
     local third = threeViewed[3]
 
-    if numberOfEffects >= 1 then
-        UI.setAttribute(timedEffect1ID, "active", "true")
-        local timedEffect1 = timedEffectsList[first]
-        local firstText = timedEffect1.Name..": "..timedEffect1.Effect.."\nTargets: "..timedEffect1.Targets.."\nRounds left: "..timedEffect1.RoundsLeft
-        UI.setAttribute(timedEffect1ID, "text", firstText)
-    end
-    if numberOfEffects >= 2 then
-        UI.setAttribute(timedEffect2ID, "active", "true")
-        local timedEffect2 = timedEffectsList[second]
-        local secondText = timedEffect2.Name..": "..timedEffect2.Effect.."\nTargets: "..timedEffect2.Targets.."\nRounds left: "..timedEffect2.RoundsLeft
-        UI.setAttribute(timedEffect2ID, "text", secondText)
-    end
-    if numberOfEffects >= 3 then
-        UI.setAttribute(timedEffect3ID, "active", "true")
-        local timedEffect3 = timedEffectsList[third]
-        local thirdText = timedEffect3.Name..": "..timedEffect3.Effect.."\nTargets: "..timedEffect3.Targets.."\nRounds left: "..timedEffect3.RoundsLeft
-        UI.setAttribute(timedEffect3ID, "text", thirdText)
-    end
+    -- printNestedTable(timedEffectsList)
+
     if numberOfEffects > 3 then -- have to choose 3 based on the buttons
+        cabooseList = timedEffectsList[numberOfEffects]
         UI.setAttribute(timedEffectsUpID, "active", "true")
         UI.setAttribute(timedEffectsDownID, "active", "true")
     else
+        cabooseList = nil
         UI.setAttribute(timedEffectsUpID, "active", "false")
         UI.setAttribute(timedEffectsDownID, "active", "false")
     end
+
+    if numberOfEffects >= 1 then
+        makeTimedEffectTextButton(timedEffect1ID, timedEffectsList[first])
+    end
+    if numberOfEffects >= 2 then
+        makeTimedEffectTextButton(timedEffect2ID, timedEffectsList[second])
+    end
+    if numberOfEffects >= 3 then
+        makeTimedEffectTextButton(timedEffect3ID, timedEffectsList[third])
+    end
+end
+
+function makeTimedEffectTextButton(timeEffectSlotID, tempTimedEffectList)
+    -- print("activating timed effect: "..timeEffectSlotID..", table = "..tostring(tempTimedEffectList))
+    UI.setAttribute(timeEffectSlotID, "active", "true")
+    local text = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect.."\nTargets: "..tempTimedEffectList.Targets.."\nRounds left: "..tempTimedEffectList.RoundsLeft
+    UI.setAttribute(timeEffectSlotID, "text", text)
+    if cabooseList == tempTimedEffectList and tempTimedEffectList ~= nil then -- caboose found
+        UI.setAttribute(timeEffectSlotID, "color", CABOOSE_RED)
+    else
+        UI.setAttribute(timeEffectSlotID, "color", DEFAULT_BLUE_GREY)
+    end
+end
+
+function printNestedTable(inputTable) -- for testing & debugging only
+    print("inputTable: "..tostring(inputTable))
+    if inputTable == nil or #(inputTable) == 0 then return end
+     for tableNum,tempTable in ipairs(inputTable) do
+        print("table "..tableNum..": "..tostring(tempTable))
+        for itemNum,item in pairs(tempTable) do
+            print("item "..itemNum..": "..item)
+        end
+     end
 end
 
 function closeTimedEffects()
@@ -1252,15 +1275,15 @@ function apiGetTimedEffects()
     end)
 end
 
-function apiAddTimedEffect(timedEffectList, pColor)
+function apiAddTimedEffect(timedEffectList01, pColor)
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TIMED_EFFECT_PATH
     -- print("url: " .. url)
-    WebRequest.post(url, timedEffectList, function(request)
+    WebRequest.post(url, timedEffectList01, function(request)
         if request.response_code > 399 then
             -- print("color: "..pColor)
             broadcastToColor("Unable to add timed effect.", pColor)
         else
-            broadcastToColor("Added timed effect:\n"..timedEffectList, pColor)
+            broadcastToColor("Added timed effect:\n"..timedEffectList01, pColor)
         end
     end)
 end
@@ -1402,7 +1425,7 @@ end
 
 function onObjectSpawn(object)
     objectGuid = object.getGUID()
-    print("GUID: "..objectGuid)
+    -- print("GUID: "..objectGuid)
     isTabletopObject = true
     setupObjectXmlUI()
 end
