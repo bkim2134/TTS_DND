@@ -15,7 +15,7 @@
 -- XML variable:
 
 XML_STRING = [[
-    <Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-440 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-440 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "10" childForceExpandHeight = "false" childForceExpandWidth = "false">
         <InputField id = "ipaddress_input" minWidth = "160" minHeight = "30" visibility = "host" onSubmit = "storeIPAddress" placeholder = "Input server address:"></InputField>
         <Button id = "change_ipaddress" minWidth = "160" minHeight = "30" visibility = "host" active = "false" onClick = "changeIPAddress">Change server address</Button>
@@ -98,16 +98,16 @@ XML_STRING = [[
     <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
 </Panel>
 
-<Panel id = "timedEffectsCreationPanel" offsetXY = "-90 -80" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "timedEffectsCreationPanel" offsetXY = "-140 -80" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "text_button_6" minHeight = "32" minWidth = "180" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
-        <InputField id = "timed_effect_name" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Effect name:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_effect" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectEffect" active = "false" placeholder = "Effect:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_targets" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectTargets" active = "false" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_duration" minHeight = "32" minWidth = "160" visibility = "host" onEndEdit = "addTimedEffectDuration" active = "false" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
-        <HorizontalLayout>
-            <Button id = "confirm_timed_effect" minHeight = "32" minWidth = "80" visibility = "host" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect">Create</Button>
-            <Button id = "cancel_timed_effect" minHeight = "32" minWidth = "80" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator">Cancel</Button>
+        <Button id = "text_button_6" minHeight = "32" minWidth = "300" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
+        <InputField id = "timed_effect_name" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Effect name:" fontStyle = "bold"></InputField>
+        <InputField id = "timed_effect_effect" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectEffect" active = "false" placeholder = "Effect:" fontStyle = "bold"></InputField>
+        <InputField id = "timed_effect_targets" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectTargets" active = "false" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
+        <InputField id = "timed_effect_duration" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectDuration" active = "false" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
+        <HorizontalLayout spacing = "20">
+            <Button id = "confirm_timed_effect" minHeight = "32" minWidth = "100" visibility = "host" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect">Create</Button>
+            <Button id = "cancel_timed_effect" minHeight = "32" minWidth = "100" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator">Cancel</Button>
         </HorizontalLayout>
     </VerticalLayout>
 </Panel>
@@ -115,13 +115,13 @@ XML_STRING = [[
 <Panel id = "timedEffectsDisplayPanel" rectAlignment = "UpperLeft" offsetXY = "80 -8" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
         <HorizontalLayout spacing = "4">
-            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsUp">↑</Button>
-            <Button id = "text_button_7"  minWidth = "160" minHeight = "32" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Current Effects (0):</Button>
-            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false" onCLick = "timedEffectsDown">↓</Button>
+            <Button id = "timed_effects_up_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" onCLick = "timedEffectsUp">↑</Button>
+            <Button id = "text_button_7"  minWidth = "160" minHeight = "32" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false">Current Effects (0):</Button>
+            <Button id = "timed_effects_down_button" minWidth = "30" minHeight = "32" color = "#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" onCLick = "timedEffectsDown">↓</Button>
         </HorizontalLayout>
-        <Button id = "text_button_8" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 1 here</Button>
-        <Button id = "text_button_9" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 2 here</Button>
-        <Button id = "text_button_10" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" visibility = "host" active = "false">Timed effect 3 here</Button>
+        <Button id = "text_button_8" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false">Timed effect 1 here</Button>
+        <Button id = "text_button_9" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false">Timed effect 2 here</Button>
+        <Button id = "text_button_10" minWidth = "300" minHeight = "80" color = "#5c7091" fontStyle = "bold" fontSize = "16px" active = "false">Timed effect 3 here</Button>
     </VerticalLayout>
 </Panel>
 
