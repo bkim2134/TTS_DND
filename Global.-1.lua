@@ -1268,7 +1268,7 @@ end
 
 function onObjectSpawn(object)
     objectGuid = object.getGUID()
-    print("GUID: "..objectGuid)
+    -- print("GUID: "..objectGuid)
     isTabletopObject = true
     setupObjectXmlUI()
 end
@@ -1279,11 +1279,11 @@ function setupObjectXmlUI()
 end
 
 function replaceXmlGuid(xml, guid)
-    print("Old XML: "..xml)
+    -- print("Old XML: "..xml)
     xml = xml:gsub(XML_REPLACE, [[onClick = "]]..guid..[[/]]) -- replace onClick = "
     xml = xml:gsub(XML_REPLACE_2, [[onEndEdit = "]]..guid..[[/]]) -- replace onEndEdit = "
     xml = xml:gsub(XML_REPLACE_3, [[onSubmit = "]]..guid..[[/]]) -- replace onSubmit = "
-    print("New XML: "..xml)
+    -- print("New XML: "..xml)
     return xml
 end
 
