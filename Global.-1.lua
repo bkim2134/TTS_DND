@@ -135,6 +135,7 @@ fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
 
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
+    -- replaceXmlGuid(XML_STRING, "12345") -- testing only
 end
 
 function onUpdate()
@@ -150,7 +151,7 @@ function storeIPAddress(player, ipAddress, id)
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
     UI.setAttribute(changeIPAddressID, "text", IP_ADDRESS)
-    UI.setAttribute(ipSelectorPanelID, "height", "70")
+    -- UI.setAttribute(ipSelectorPanelID, "height", "70")
     loadPlayerData()
 end
 
@@ -159,7 +160,7 @@ function changeIPAddress()
     UI.setAttribute(inputIPAddressID, "visibility", "host")
     UI.setAttribute(changeIPAddressID, "active", "false")
     UI.setAttribute(addAPlayerID, "active", "false")
-    UI.setAttribute(ipSelectorPanelID, "height", "30")
+    -- UI.setAttribute(ipSelectorPanelID, "height", "30")
 end
 
 -- Player selection functions:
@@ -197,7 +198,10 @@ function displayPcs()
         else
             UI.setAttribute(buttonId, "onClick", "playerSelected("..name..")")
         end
-        
+    end
+    for c = numberOfPCs + 1, 12, 1 do
+        buttonId = "buttonId" .. tostring(c)
+        UI.setAttribute(buttonId, "active", "false")
     end
 
     UI.setAttribute(textButtonID, "active", "true")
@@ -328,7 +332,6 @@ function requestInitiative()
     -- for each color, if a PC, activate that UI element to request init
     if isNotEmpty(playerColorMap.White) then
         UI.setAttribute(whiteInitiativeID, "active", "true")
-
     end
     if isNotEmpty(playerColorMap.Red) then
         UI.setAttribute(redInitiativeID, "active", "true")
@@ -391,7 +394,6 @@ function rollGmInitiative()
     UI.setAttribute(gmInitiativeID, "active", "false")
     -- broadcastToAll("Rolling npcs...")
     apiRollInit()
-    setUpTurnOrder()
     UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
 end
 
@@ -461,7 +463,7 @@ end
 function addNameToPartySkillPopup(skillName, skillTotal)
     skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
     table.insert(statsList,tonumber(skillTotal))
-    UI.setAttribute(skillTextID, "text", "Party Skill Results:\n"..skillNameList.."\nStatistics:\n["..getSkillStatistics().."]")
+    UI.setAttribute(skillTextID, "text", "Party Skill Results:\n\n"..skillNameList.."\n\nStatistics:\n"..getSkillStatistics())
     UI.setAttribute(skillTextID, "active", "true")
 
     UI.setAttribute(openPartySkillViewerID, "active", "true")
@@ -473,7 +475,7 @@ function getSkillStatistics()
     -- get the total, mean, & median
     local sum = 0
     for _,number in pairs(statsList) do
-        print("number: "..tostring(number))
+        -- print("number: "..tostring(number))
         sum = sum + number
     end
 
@@ -488,12 +490,12 @@ function getSkillStatistics()
     local median = 0
     print("mid: "..tostring(mid))
     if math.floor(mid)==mid then
-        median = nums[mid]
+        median = statsList[mid]
     else
         median = (statsList[math.floor(mid)]+statsList[math.ceil(mid)])/2
     end
 
-    statsString = "Total: "..tostring(sum)..", Average: "..tostring(mean)..", Middle: "..tostring(median)
+    statsString = "\nTotal: "..tostring(sum).."\nMiddle: "..tostring(median).."\nAverage: "..tostring(mean)
     return statsString
 end
 
@@ -518,13 +520,18 @@ end
 -- Turn & time functions:
 
 function announceTurn(currPlayer)
-    if isCharacterNpc(currPlayer) then
-        currPlayer = cutOutCRtext(currPlayer)
-        UI.setAttribute(endTurnGmID, "color", NPC_PURPLE)
+    if currPlayer ~= nil and currPlayer ~= "" then
+        if isCharacterNpc(currPlayer) then
+            currPlayer = cutOutCRtext(currPlayer)
+            UI.setAttribute(endTurnGmID, "color", NPC_PURPLE)
+        else
+            UI.setAttribute(endTurnGmID, "color", DEFAULT_RED_PINK)
+        end
+        currentTurnName = currPlayer
     else
-        UI.setAttribute(endTurnGmID, "color", DEFAULT_RED_PINK)
+        currentTurnName = "Nobody"
     end
-    currentTurnName = currPlayer
+    
     broadcastToAll("It\'s your turn, "..currentTurnName.."!")
 
     noMatch = false
@@ -577,10 +584,16 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    if isCharacterNpc(nextPlayer) then
-        nextPlayer = cutOutCRtext(nextPlayer)
+    -- print("nextPlayer:"..nextPlayer)
+    if nextPlayer ~= nil and nextPlayer ~= "" then
+        if isCharacterNpc(nextPlayer) then
+            nextPlayer = cutOutCRtext(nextPlayer)
+        end
+        nextTurnName = nextPlayer
+    else
+        nextTurnName = "Nobody"
     end
-    nextTurnName = nextPlayer
+    
 
     displayTurnOrder() -- performs api call
     displayTimedEffects() -- perfmors api call
@@ -636,19 +649,51 @@ end
 function checkNumberOfInits()
     if initiativeOrderList == nil then return end
     numberOfPeopleInInitiative = #(initiativeOrderList)
-    print("displaying "..numberOfPeopleInInitiative.." characters in initiative order")
-    if numberOfPeopleInInitiative == 0 then return end
+    -- print("displaying "..numberOfPeopleInInitiative.." characters in initiative order")
+    if numberOfPeopleInInitiative == 0 then
+        closeTurnOrder()
+        return 
+    end
     UI.setAttribute(initTextID, "active", "true")
     UI.setAttribute(initTextID, "text", "Initiatve Order ("..numberOfPeopleInInitiative.." characters):")
+    setBlankTurnsInactive()
     getToCurrChar()
     refresh5Inits() 
 end
 
-function getToCurrChar()
-    while true do
-        if isCurrChar(initiativeOrderList[fiveViewed[1]].Name) then return end
-        turnOrderLeft()
+function setBlankTurnsInactive()
+    if 0 < numberOfPeopleInInitiative and numberOfPeopleInInitiative < 5 then
+        UI.setAttribute(initSlot5ID, "active", "false")
+        if 0 < numberOfPeopleInInitiative and numberOfPeopleInInitiative < 4 then
+            UI.setAttribute(initSlot4ID, "active", "false")
+            if 0 < numberOfPeopleInInitiative and numberOfPeopleInInitiative < 3 then
+                UI.setAttribute(initSlot3ID, "active", "false")
+                if numberOfPeopleInInitiative == 1 then
+                    UI.setAttribute(initSlot2ID, "active", "false")
+                end
+            end
+        end
     end
+end
+
+function getToCurrChar()
+    if isCurrentCharacterInInitList() then
+        while true do
+            if isCurrChar(initiativeOrderList[fiveViewed[1]].Name) then return end
+            turnOrderLeft()
+        end
+    else
+        print("There is no current character. End a turn or refresh the server to find the current character.")
+    end
+    
+end
+
+function isCurrentCharacterInInitList()
+    for _, v in pairs(initiativeOrderList) do
+        -- print(currentTurnName)
+		if isCurrChar(v.Name)then return true end
+	end
+	return false
 end
 
 function turnOrderLeft()
@@ -690,7 +735,7 @@ function turnOrderRight()
     local thirdTurnNum = fiveViewed[3]
     local fourthTurnNum = fiveViewed[4]
     local fifthTurnNum = fiveViewed[5]
-    print("right. fiveViewed numbers: "..firstTurnNum..","..secondTurnNum..","..thirdTurnNum..","..fourthTurnNum..","..fifthTurnNum)
+    -- print("right. fiveViewed numbers: "..firstTurnNum..","..secondTurnNum..","..thirdTurnNum..","..fourthTurnNum..","..fifthTurnNum)
 
     if firstTurnNum == 1 then
         fiveViewed = {numberOfPeopleInInitiative, 1, 2, 3, 4}
@@ -900,11 +945,24 @@ end
 function checkNumberOfEffects()
     if timedEffectsList == nil then return end
     numberOfEffects = #(timedEffectsList)
-    print("displaying "..numberOfEffects.." timed events")
-    if numberOfEffects == 0 then return end
+    -- print("displaying "..numberOfEffects.." timed events")
+    if numberOfEffects == 0 then
+        closeTimedEffects()
+        return
+    end
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
     UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
+    setBlankTimedEffectsInactive()
     refresh3TimedEffects() 
+end
+
+function setBlankTimedEffectsInactive()
+    if 0 < numberOfEffects and numberOfEffects < 3 then
+        UI.setAttribute(timedEffect3ID, "active", "false")
+        if numberOfEffects == 1 then
+            UI.setAttribute(timedEffect2ID, "active", "false")
+        end
+    end
 end
 
 function timedEffectsUp()
@@ -1006,9 +1064,8 @@ function loadPlayerData()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_PCS_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             makePcList(request.text);
         end
@@ -1018,25 +1075,18 @@ end
 function apiAddToMap(name)
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ADD_TO_MAP_PATH
     -- print("url: " .. url)
-    WebRequest.post(url, name, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
-        -- else
-            -- print(request.text);
-        end
-    end)
+    WebRequest.post(url, name)
 end
 
 function apiRollInit()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. ROLL_INITIATIVE_PATH
     -- print("url: " .. url)
     WebRequest.post(url, initNamesJsonStringToSend, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
-        -- else
-        --     print(request.text)
+        if request.response_code > 399 then
+            print("Unable to roll initiative. error: "..request.text)
+        else
+            -- print("init returned: "..request.text)
+            setUpTurnOrder()
         end
     end)
 end
@@ -1045,9 +1095,8 @@ function apiGetInit()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_INITIATIVE_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             receiveInitiativeStr(request.text) -- converts to list
             checkNumberOfInits() -- populates the textButtons
@@ -1060,9 +1109,8 @@ function apiGetTimedEffects()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_TIMED_EFFECTS_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             receiveTimedEffects(request.text) -- convert to a list
             checkNumberOfEffects() -- will populate the textButtons
@@ -1087,9 +1135,8 @@ function getCurrentPlayer()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_CURRENT_PLAYER_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             announceTurn(request.text);
             getNextPlayer()
@@ -1101,9 +1148,8 @@ function getNextPlayer()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_NEXT_PLAYER_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             setNextTurn(request.text);
         end
@@ -1114,9 +1160,8 @@ function apiEndTurn()
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. NEXT_TURN_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
-        if request.is_error then
-            print("error: " .. request.error)
-            log(request.error)
+        if request.response_code > 399 then
+            print("error: " .. request.text)
         else
             announceTime(request.text);
         end
@@ -1234,11 +1279,11 @@ function setupObjectXmlUI()
 end
 
 function replaceXmlGuid(xml, guid)
-    print("Old XML: "..xml)
+    -- print("Old XML: "..xml)
     xml = xml:gsub(XML_REPLACE, [[onClick = "]]..guid..[[/]]) -- replace onClick = "
     xml = xml:gsub(XML_REPLACE_2, [[onEndEdit = "]]..guid..[[/]]) -- replace onEndEdit = "
     xml = xml:gsub(XML_REPLACE_3, [[onSubmit = "]]..guid..[[/]]) -- replace onSubmit = "
-    print("New XML: "..xml)
+    -- print("New XML: "..xml)
     return xml
 end
 
@@ -1253,6 +1298,178 @@ end
 --         local foundElement = getElementById(table, id)
 --         if foundElement != nil then 
 --             return foundElement
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
+--         end
+--     end
+--     return nil
+-- end
+
+-- function getElementById(xmlTable, id)
+--     local parentTable = xmlTable
+
+--     if parentTable[ATTRIBUTES] != nil and parentTable[ATTRIBUTES][ID] != nil and parentTable[ATTRIBUTES][ID] == id then
+--         return parentTable
+
+--     else
+--             if type(parentTable[CHILDREN]) == "table" then
+--                 for _, childTable in pairs(parentTable[CHILDREN]) do
+--                     parentTable = childTable
+--                     local foundElement = getElementById(parentTable,id)
+--                     if foundElement != nil then
+--                         return foundElement
+--                     end
+--                 end  
+--             end
+
+--     end
+
+--     return nil
+-- end
+
+-- function buildInitiativeRow(fullInitiativeOrder)
+--     UI.setAttribute(turnOrderID, "active", "true")
+
+--     local gottenElement = getElementByIdFromRoot(UI.getXmlTable() , "nestedInnerPanelLeft")
+
+--     broadcastToAll(gottenElement[ATTRIBUTES][ID])
+--     --we have to locate the xml element that will contain 
+    
+--     -- now populate the xml:
+
+
+--     for _, characterName in ipairs(fullInitiativeOrder) do
+--         broadcastToAll(characterName)
+--     end
+-- end
+
 --         end
 --     end
 --     return nil
