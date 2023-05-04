@@ -86,12 +86,19 @@
 
 <Panel id = "timedEffectsCreationPanel" offsetXY = "-140 -80" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "text_button_6" minHeight = "32" minWidth = "300" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
-        <InputField id = "timed_effect_name" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Effect name:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_effect" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectEffect" active = "false" placeholder = "Effect:" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_targets" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectTargets" active = "false" placeholder = "Effect target(s):" fontStyle = "bold"></InputField>
-        <InputField id = "timed_effect_duration" minHeight = "32" minWidth = "280" visibility = "host" onEndEdit = "addTimedEffectDuration" active = "false" placeholder = "Effect duration (in rounds) :" fontStyle = "bold"></InputField>
-        <HorizontalLayout spacing = "20">
+        <Button id = "text_button_6" minHeight = "32" minWidth = "320" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
+        <InputField id = "timed_effect_name" minHeight = "32" minWidth = "300" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Name:" fontStyle = "bold"></InputField>
+        <InputField id = "timed_effect_effect" minHeight = "32" minWidth = "300" visibility = "host" onEndEdit = "addTimedEffectEffect" active = "false" placeholder = "Effect:" fontStyle = "bold"></InputField>
+        <InputField id = "timed_effect_targets" minHeight = "32" minWidth = "300" visibility = "host" onEndEdit = "addTimedEffectTargets" active = "false" placeholder = "Target(s):" fontStyle = "bold"></InputField>
+        <HorizontalLayout spacing = "10" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
+            <InputField id = "timed_effect_duration" minHeight = "32" minWidth = "130" visibility = "host" onEndEdit = "addTimedEffectDuration" active = "false" placeholder = "Rounds:" fontStyle = "bold"></InputField>
+            <InputField id = "timed_effect_duration_minutes" minHeight = "32" minWidth = "130" visibility = "host" onEndEdit = "addTimedEffectDurationMinutes" active = "false" placeholder = "Minutes:" fontStyle = "bold"></InputField>
+        </HorizontalLayout>
+        <HorizontalLayout spacing = "10" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
+            <InputField id = "timed_effect_duration_hours" minHeight = "32" minWidth = "130" visibility = "host" onEndEdit = "addTimedEffectDurationHours" active = "false" placeholder = "Hours:" fontStyle = "bold"></InputField>
+            <InputField id = "timed_effect_duration_days" minHeight = "32" minWidth = "130" visibility = "host" onEndEdit = "addTimedEffectDurationDays" active = "false" placeholder = "Days:" fontStyle = "bold"></InputField>
+        </HorizontalLayout>
+        <HorizontalLayout spacing = "40" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
             <Button id = "confirm_timed_effect" minHeight = "32" minWidth = "100" visibility = "host" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "confirmTimedEffect">Create</Button>
             <Button id = "cancel_timed_effect" minHeight = "32" minWidth = "100" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "closeTimedEffectCreator">Cancel</Button>
         </HorizontalLayout>
