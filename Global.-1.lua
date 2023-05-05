@@ -63,6 +63,9 @@ skillTextID = "text_button_5"
 openPartySkillViewerID = "openPartySkillViewer"
 addTimedEffectID = "add_timed_effect"
 addTimedEffectDurationID = "timed_effect_duration"
+addTimedEffectDurationMinutesID = "timed_effect_duration_minutes"
+addTimedEffectDurationHoursID = "timed_effect_duration_hours"
+addTimedEffectDurationDaysID = "timed_effect_duration_days"
 addTimedEffectTargetsID = "timed_effect_targets"
 addTimedEffectNameID = "timed_effect_name"
 timedEffectEffectID = "timed_effect_effect"
@@ -585,7 +588,7 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    -- print("nextPlayer:"..nextPlayer)
+    -- print("nextPlayer: "..nextPlayer)
     if nextPlayer ~= nil and nextPlayer ~= "" then
         if isCharacterNpc(nextPlayer) then
             nextPlayer = cutOutCRtext(nextPlayer)
@@ -595,7 +598,6 @@ function setNextTurn(nextPlayer)
         nextTurnName = "Nobody"
     end
     
-
     displayTurnOrder() -- performs api call
     displayTimedEffects() -- perfmors api call
 end
@@ -847,7 +849,14 @@ function addTimedEffect(player)
     effectTargets = ""
     effectDuration = ""
     timedEffectEffect = ""
+    effectRounds = ""
+    effectMinutes = ""
+    effectHours = ""
+    effectDays = ""
     UI.setAttribute(addTimedEffectDurationID, "active", "true")
+    UI.setAttribute(addTimedEffectDurationMinutesID, "active", "true")
+    UI.setAttribute(addTimedEffectDurationHoursID, "active", "true")
+    UI.setAttribute(addTimedEffectDurationDaysID, "active", "true")
     UI.setAttribute(addTimedEffectTargetsID, "active", "true")
     UI.setAttribute(addTimedEffectNameID, "active", "true")
     UI.setAttribute(timedEffectEffectID, "active", "true")
@@ -866,6 +875,9 @@ end
 
 function setTimedEffectColor(pColor)
     UI.setAttribute(addTimedEffectDurationID, "visibility", pColor)
+    UI.setAttribute(addTimedEffectDurationMinutesID, "visibility", pColor)
+    UI.setAttribute(addTimedEffectDurationHoursID, "visibility", pColor)
+    UI.setAttribute(addTimedEffectDurationDaysID, "visibility", pColor)
     UI.setAttribute(addTimedEffectTargetsID, "visibility", pColor)
     UI.setAttribute(addTimedEffectNameID,"visibility", pColor)
     UI.setAttribute(timedEffectEffectID, "visibility", pColor)
@@ -876,6 +888,9 @@ end
 
 function closeTimedEffectCreator()
     UI.setAttribute(addTimedEffectDurationID, "active", "false")
+    UI.setAttribute(addTimedEffectDurationMinutesID, "active", "false")
+    UI.setAttribute(addTimedEffectDurationHoursID, "active", "false")
+    UI.setAttribute(addTimedEffectDurationDaysID, "active", "false")
     UI.setAttribute(addTimedEffectTargetsID, "active", "false")
     UI.setAttribute(addTimedEffectNameID, "active", "false")
     UI.setAttribute(timedEffectEffectID, "active", "false")
@@ -906,20 +921,31 @@ function addTimedEffectTargets(player, targets, id)
 end
 
 function addTimedEffectDuration(player, duration, id)
-    effectDuration = duration
+    effectRounds = duration
+end
+function addTimedEffectDurationMinutes(player, duration, id)
+    effectMinutes = duration
+end
+function addTimedEffectDurationHours(player, duration, id)
+    effectHours = duration
+end
+function addTimedEffectDurationDays(player, duration, id)
+    effectDays = duration
 end
 
 function confirmTimedEffect(player, id)
+    if convertDurationToRounds() then -- returning true is an error! (duration not entered)
+        broadcastToColor("You cannot create a timed effect without a duration!", player.color)
+        return
+    end
     timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
     -- print("timedEffectListToSend: "..timedEffectListToSend)
     apiAddTimedEffect(timedEffectListToSend, player.color)
-    closeTimedEffectCreator()
-    displayTimedEffects()
 end
 
 function receiveTimedEffects(timedEffectsStr)
     -- print("received: "..timedEffectsStr)
-    timedEffectsList = {{Name="",Effect="",Targets="",RoundsLeft=""}}
+    timedEffectsList = {{Name="",Effect="",Targets="",Duration=""}}
     timedEffectsList = getTimedEffectListFromJson(timedEffectsStr)
     -- print(timedEffectsList[1].Name)
 end
@@ -928,19 +954,19 @@ function getTimedEffectListFromJson(timedEffectJsonStr)
     local effectsList = {}
     local responseBody = JSON.decode(timedEffectJsonStr)
     for i, v in pairs( responseBody ) do
-        local tempEffectList = {Name="",Effect="",Targets="",RoundsLeft=""}
+        local tempEffectList = {Name="",Effect="",Targets="",Duration=""}
         tempEffectList.Name = responseBody[i]["name"]
         tempEffectList.Effect = responseBody[i]["effect"]
         tempEffectList.Targets = responseBody[i]["targets"]
-        tempEffectList.RoundsLeft = responseBody[i]["timeLeft"]
-        -- print(tempEffectList.Effect)
+        local timeInRounds = responseBody[i]["timeLeft"]
+        tempEffectList.Duration = convertRoundsStrToTimeLeft(timeInRounds)
         table.insert(effectsList,tempEffectList)
-        -- print(effectsList[i].Name)
     end
     return effectsList
 end
 
 function displayTimedEffects() -- appear only in combat, dissapear when combat ends
+    -- print("displaying timed effects...")
     apiGetTimedEffects() --calls receiveTimedEffects & checkNumberOfEffects
 end
 
@@ -1045,7 +1071,7 @@ end
 function makeTimedEffectTextButton(timeEffectSlotID, tempTimedEffectList)
     -- print("activating timed effect: "..timeEffectSlotID..", table = "..tostring(tempTimedEffectList))
     UI.setAttribute(timeEffectSlotID, "active", "true")
-    local text = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect.."\nTargets: "..tempTimedEffectList.Targets.."\nRounds left: "..tempTimedEffectList.RoundsLeft
+    local text = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect.."\nTargets: "..tempTimedEffectList.Targets.."\nTime left: "..tempTimedEffectList.Duration
     UI.setAttribute(timeEffectSlotID, "text", text)
     if cabooseList == tempTimedEffectList and tempTimedEffectList ~= nil then -- caboose found
         UI.setAttribute(timeEffectSlotID, "color", CABOOSE_RED)
@@ -1149,6 +1175,8 @@ function apiAddTimedEffect(timedEffectList01, pColor)
             broadcastToColor("Unable to add timed effect.", pColor)
         else
             broadcastToColor("Added timed effect:\n"..timedEffectList01, pColor)
+            closeTimedEffectCreator()
+            displayTimedEffects()
         end
     end)
 end
@@ -1284,6 +1312,138 @@ function cutOutCRtext(str)
     end
     -- print("non CR str: "..str)
     return str
+end
+
+function convertRoundsStrToTimeLeft(durationStringRounds)
+    local fullTimeNum = tonumber(durationStringRounds)
+    local timeStr = ""
+    local years = 0
+    local days = 0
+    local hours = 0
+    local minutes = 0
+    local rounds = 0
+
+    if fullTimeNum > 0 then
+        if fullTimeNum >= 5256000 then
+            years = math.floor(fullTimeNum / 5256000)
+            fullTimeNum = fullTimeNum % 5256000
+        end
+        if fullTimeNum >= 14400 then
+            days = math.floor(fullTimeNum / 14400)
+            fullTimeNum = fullTimeNum % 14400
+        end
+        if fullTimeNum >= 600 then
+            hours = math.floor(fullTimeNum / 600)
+            fullTimeNum = fullTimeNum % 600
+        end
+        if fullTimeNum >= 10 then
+            minutes = math.floor(fullTimeNum / 10)
+            rounds = fullTimeNum % 10
+        end
+
+        local yearsStr = ""
+        local daysStr = ""
+        local hoursStr = ""
+        local minutesStr = ""
+        local roundsStr = ""
+
+        if rounds > 0 then 
+            if rounds == 1 then
+                roundsStr = tostring(rounds).." round  "
+            else
+                roundsStr = tostring(rounds).." rounds  "
+            end
+        end
+
+        if minutes > 0 then 
+            if minutes == 1 then
+                minutesStr = tostring(minutes).." minute, "
+            else
+                minutesStr = tostring(minutes).." minutes, "
+            end            
+        end
+
+        if hours > 0 then 
+            if hours == 1 then
+                hoursStr = tostring(hours).." hour, "
+            else
+                hoursStr = tostring(hours).." hours, "
+            end
+        end
+
+        if days > 0 then 
+            if days == 1 then
+                daysStr = tostring(days).." day, "
+            else
+                daysStr = tostring(days).." days, "
+            end
+        end
+
+        if years > 0 then 
+            if years == 1 then
+                yearsStr = tostring(years).." year, "
+            else
+                yearsStr = tostring(years).." years, "
+            end
+        end
+
+        if rounds > 0 then
+            if years + days + hours + minutes > 0 then
+                timeStr = yearsStr..daysStr..hoursStr..string.sub(minutesStr, 1, string.len(minutesStr)-2).." & "..roundsStr
+            else
+                timeStr = roundsStr
+            end
+        else -- now we know there are no rounds, lastStr could be minutes
+            if minutes > 0 then
+                if years + days + hours > 0 then
+                    timeStr = yearsStr..daysStr..string.sub(hoursStr, 1, string.len(hoursStr)-2).." & "..minutesStr
+                else
+                    timeStr = minutesStr
+                end
+            else -- no minutes or rounds, lastStr could be hours
+                if hours > 0 then
+                    if years + days > 0 then
+                        timeStr = yearsStr..string.sub(daysStr, 1, string.len(daysStr)-2).." & "..hoursStr
+                    else
+                        timeStr = hoursStr
+                    end
+                else -- no hours either, lastStr could be days
+                    if days > 0 then
+                        if years > 0 then
+                            timeStr = string.sub(yearsStr, 1, string.len(yearsStr)-2).." & "..daysStr
+                        else
+                            timeStr = daysStr
+                        end
+                    else -- no days either, lastStr cannot be years tho
+                        timeStr = yearsStr
+                    end
+                end
+            end
+        end
+        
+        timeStr = string.sub(timeStr, 1, string.len(timeStr)-2)
+    else
+        timeStr = "0 rounds" -- this should never happen
+    end
+    return timeStr
+end
+
+function convertDurationToRounds()
+    local roundNum = tonumber(effectRounds)
+    if roundNum == nil then roundNum = 0 end
+    local minNum = tonumber(effectMinutes)
+    if minNum == nil then minNum = 0 end
+    local hourNum = tonumber(effectHours)
+    if hourNum == nil then hourNum = 0 end
+    local dayNum = tonumber(effectDays)
+    if dayNum == nil then dayNum = 0 end
+    -- print("rounds: "..tostring(roundNum)..", minutes: "..tostring(minNum)..", hours: "..tostring(hourNum)..", days: "..tostring(dayNum))
+    local totalDuration = roundNum + minNum*10 + hourNum*600 + dayNum*14400
+    if totalDuration < 1 then
+        return true -- returning true is an error! (duration not entered)
+    end
+    effectDuration = tostring(totalDuration) -- result in rounds
+    return false
 end
 
 -- Object XML Utility functions:
