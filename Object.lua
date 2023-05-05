@@ -23,7 +23,7 @@ XML_STRING = [[
     </VerticalLayout>
 </Panel>
 
-<Panel id = "playerSelectorPanel" width = "1000" height = "400" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "playerSelectorPanel" width = "1000" height = "400" offsetXY = "0 140" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout childForceExpandHeight = "false">
         <Button id = "text_button" minHeight = "32" colors = "#d1d1d1|#d1d1d1|#d1d1d1|#d1d1d1" fontStyle = "bold" fontSize = "16px" active = "false">Choose a character:</Button>
         <GridLayout id = "pc_list" padding = "30 0 20 0" spacing = "20 10" cellSize = "300 75" active = "false">
@@ -73,7 +73,7 @@ XML_STRING = [[
 </Panel>
 
 <Panel id = "independentButtonsPanel">
-    <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 160" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
+    <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 150" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
     <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
     <Button id = "add_timed_effect" rectAlignment = "MiddleLeft" offsetXY = "80 212" width = "200" height = "50" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
 </Panel>
@@ -98,7 +98,7 @@ XML_STRING = [[
     <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
 </Panel>
 
-<Panel id = "timedEffectsCreationPanel" offsetXY = "-140 -80" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
+<Panel id = "timedEffectsCreationPanel" offsetXY = "-150 -70" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
         <Button id = "text_button_6" minHeight = "32" minWidth = "320" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" visibility = "host">Enter an effect:</Button>
         <InputField id = "timed_effect_name" minHeight = "32" minWidth = "300" visibility = "host" onEndEdit = "addTimedEffectName" active = "false" placeholder = "Name:" fontStyle = "bold"></InputField>
@@ -730,7 +730,7 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    -- print("nextPlayer:"..nextPlayer)
+    -- print("nextPlayer: "..nextPlayer)
     if nextPlayer ~= nil and nextPlayer ~= "" then
         if isCharacterNpc(nextPlayer) then
             nextPlayer = cutOutCRtext(nextPlayer)
@@ -740,7 +740,6 @@ function setNextTurn(nextPlayer)
         nextTurnName = "Nobody"
     end
     
-
     displayTurnOrder() -- performs api call
     displayTimedEffects() -- perfmors api call
 end
@@ -1109,6 +1108,7 @@ function getTimedEffectListFromJson(timedEffectJsonStr)
 end
 
 function displayTimedEffects() -- appear only in combat, dissapear when combat ends
+    -- print("displaying timed effects...")
     apiGetTimedEffects() --calls receiveTimedEffects & checkNumberOfEffects
 end
 
@@ -1456,8 +1456,8 @@ function cutOutCRtext(str)
     return str
 end
 
-function convertRoundsStrToTimeLeft(roundsStr)
-    local fullTimeNum = tonumber(roundsStr)
+function convertRoundsStrToTimeLeft(durationStringRounds)
+    local fullTimeNum = tonumber(durationStringRounds)
     local timeStr = ""
     local years = 0
     local days = 0
@@ -1466,24 +1466,21 @@ function convertRoundsStrToTimeLeft(roundsStr)
     local rounds = 0
 
     if fullTimeNum > 0 then
-        if fullTimeNum >= 31536000 then
-            years = math.floor(fullTimeNum / 31536000)
-            fullTimeNum = fullTimeNum % 31536000
+        if fullTimeNum >= 5256000 then
+            years = math.floor(fullTimeNum / 5256000)
+            fullTimeNum = fullTimeNum % 5256000
         end
-        if fullTimeNum >= 86400 then
-            days = math.floor(fullTimeNum / 86400)
-            fullTimeNum = fullTimeNum % 86400
+        if fullTimeNum >= 14400 then
+            days = math.floor(fullTimeNum / 14400)
+            fullTimeNum = fullTimeNum % 14400
         end
-        if fullTimeNum >= 3600 then
-            hours = math.floor(fullTimeNum / 3600)
-            fullTimeNum = fullTimeNum % 3600
+        if fullTimeNum >= 600 then
+            hours = math.floor(fullTimeNum / 600)
+            fullTimeNum = fullTimeNum % 600
         end
-        if fullTimeNum >= 60 then
-            minutes = math.floor(fullTimeNum / 60)
-            fullTimeNum = fullTimeNum % 60
-        end
-        if fullTimeNum >= 6 then
-            rounds = math.floor(fullTimeNum / 6)
+        if fullTimeNum >= 10 then
+            minutes = math.floor(fullTimeNum / 10)
+            rounds = fullTimeNum % 10
         end
 
         local yearsStr = ""

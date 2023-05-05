@@ -588,7 +588,7 @@ function announceTurn(currPlayer)
 end
 
 function setNextTurn(nextPlayer)
-    -- print("nextPlayer:"..nextPlayer)
+    -- print("nextPlayer: "..nextPlayer)
     if nextPlayer ~= nil and nextPlayer ~= "" then
         if isCharacterNpc(nextPlayer) then
             nextPlayer = cutOutCRtext(nextPlayer)
@@ -598,7 +598,6 @@ function setNextTurn(nextPlayer)
         nextTurnName = "Nobody"
     end
     
-
     displayTurnOrder() -- performs api call
     displayTimedEffects() -- perfmors api call
 end
@@ -967,6 +966,7 @@ function getTimedEffectListFromJson(timedEffectJsonStr)
 end
 
 function displayTimedEffects() -- appear only in combat, dissapear when combat ends
+    -- print("displaying timed effects...")
     apiGetTimedEffects() --calls receiveTimedEffects & checkNumberOfEffects
 end
 
@@ -1314,8 +1314,8 @@ function cutOutCRtext(str)
     return str
 end
 
-function convertRoundsStrToTimeLeft(roundsStr)
-    local fullTimeNum = tonumber(roundsStr)
+function convertRoundsStrToTimeLeft(durationStringRounds)
+    local fullTimeNum = tonumber(durationStringRounds)
     local timeStr = ""
     local years = 0
     local days = 0
@@ -1324,24 +1324,21 @@ function convertRoundsStrToTimeLeft(roundsStr)
     local rounds = 0
 
     if fullTimeNum > 0 then
-        if fullTimeNum >= 31536000 then
-            years = math.floor(fullTimeNum / 31536000)
-            fullTimeNum = fullTimeNum % 31536000
+        if fullTimeNum >= 5256000 then
+            years = math.floor(fullTimeNum / 5256000)
+            fullTimeNum = fullTimeNum % 5256000
         end
-        if fullTimeNum >= 86400 then
-            days = math.floor(fullTimeNum / 86400)
-            fullTimeNum = fullTimeNum % 86400
+        if fullTimeNum >= 14400 then
+            days = math.floor(fullTimeNum / 14400)
+            fullTimeNum = fullTimeNum % 14400
         end
-        if fullTimeNum >= 3600 then
-            hours = math.floor(fullTimeNum / 3600)
-            fullTimeNum = fullTimeNum % 3600
+        if fullTimeNum >= 600 then
+            hours = math.floor(fullTimeNum / 600)
+            fullTimeNum = fullTimeNum % 600
         end
-        if fullTimeNum >= 60 then
-            minutes = math.floor(fullTimeNum / 60)
-            fullTimeNum = fullTimeNum % 60
-        end
-        if fullTimeNum >= 6 then
-            rounds = math.floor(fullTimeNum / 6)
+        if fullTimeNum >= 10 then
+            minutes = math.floor(fullTimeNum / 10)
+            rounds = fullTimeNum % 10
         end
 
         local yearsStr = ""
