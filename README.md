@@ -29,3 +29,5 @@
 -- Upcoming functions: 
 
 -- add funtion to 'reveal' enemy attacks, weakneses or reactions! 
+
+-> possibly add recursion / dynamic render a scrollable list of initOrder?
