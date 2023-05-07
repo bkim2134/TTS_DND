@@ -2,6 +2,11 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
+-- Tabletop Object variables:
+
+isTabletopObject = false
+objectGuid = "12345"
+
 -- XML variable:
 
 XML_STRING = [[
@@ -1454,10 +1459,11 @@ end
 -- Object XML Utility functions:
 
 function onObjectSpawn(object)
-    objectGuid = object.getGUID()
-    -- print("GUID: "..objectGuid)
-    isTabletopObject = true
-    setupObjectXmlUI()
+    if isTabletopObject then
+        -- objectGuid = object.getGUID()
+        print("GUID: "..objectGuid)
+        setupObjectXmlUI()
+    end
 end
 
 function setupObjectXmlUI()
