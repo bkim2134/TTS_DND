@@ -1459,9 +1459,8 @@ end
 -- Object XML Utility functions:
 
 function onObjectSpawn(object)
+    -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
     if isTabletopObject then
-        -- objectGuid = object.getGUID()
-        print("GUID: "..objectGuid)
         setupObjectXmlUI()
     end
 end
