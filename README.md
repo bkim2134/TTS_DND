@@ -31,3 +31,6 @@
 -- add funtion to 'reveal' enemy attacks, weakneses or reactions! 
 
 -> possibly add recursion / dynamic render a scrollable list of initOrder?
+
+
+Connects to: https://github.com/Jellingsenh/DungeonsAndDragonsCombatAssistant
