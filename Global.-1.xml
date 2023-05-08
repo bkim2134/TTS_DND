@@ -45,7 +45,7 @@
 <Panel id = "gmInitPanel" rectAlignment = "MiddleRight" offsetXY = "-10 120" width = "200" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "10" childForceExpandHeight = "false">
         <Button id = "requestInit" minHeight = "50" visibility = "host"  active = "false" onClick = "requestInitiative" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
-        <Button id = "refresh_combat_gm" minHeight = "50" visibility = "host" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "setUpTurnOrder">Refresh Current Players</Button>
+        <Button id = "refresh_combat_gm" minHeight = "50" visibility = "host" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "setUpTurnOrder">Refresh Initiative</Button>
         <Button id = "end_turn_gm" minHeight = "50" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "apiEndTurn">End Current Turn</Button>
         <Button id = "end_combat_gm" minHeight = "50" visibility = "host" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "endCombat">End Combat</Button>
     </VerticalLayout>

@@ -1,16 +1,23 @@
 -- Object.lua: 
 -- 1) Copy Global.-1.lua into this file (below step 4).
--- 2) Copy Global.-1.xml into XML_STRING.
+-- 2) set isTableTopObject to true
+-- 3) Copy Global.-1.xml into XML_STRING.
 
 -- In tabletop:
--- 3) Copy the code below into the object's lua in the scripting editor.
--- 4) Save the object. I like to name it 'D&D Combat Assistant engine'.
--- 5) When you load in the object, it will load the D&D Combat Assistant.
+-- 4) Spawn in an object, populate objectGuid (line 20) with the object's GUID.
+-- 5) Copy the code below into the object's lua in the scripting editor.
+-- 6) Save the object. I like to name it 'D&D Combat Assistant engine'.
+-- 7) When you load in the object, it will load the D&D Combat Assistant.
 
 
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
+
+-- Tabletop Object variables:
+
+isTabletopObject = true
+objectGuid = "12345"
 
 -- XML variable:
 
@@ -59,7 +66,7 @@ XML_STRING = [[
 <Panel id = "gmInitPanel" rectAlignment = "MiddleRight" offsetXY = "-10 120" width = "200" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "10" childForceExpandHeight = "false">
         <Button id = "requestInit" minHeight = "50" visibility = "host"  active = "false" onClick = "requestInitiative" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Request Initiatve</Button>
-        <Button id = "refresh_combat_gm" minHeight = "50" visibility = "host" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "setUpTurnOrder">Refresh Current Players</Button>
+        <Button id = "refresh_combat_gm" minHeight = "50" visibility = "host" color = "#339933" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "setUpTurnOrder">Refresh Initiative</Button>
         <Button id = "end_turn_gm" minHeight = "50" visibility = "host" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "apiEndTurn">End Current Turn</Button>
         <Button id = "end_combat_gm" minHeight = "50" visibility = "host" color = "#cc0000" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "endCombat">End Combat</Button>
     </VerticalLayout>
@@ -157,7 +164,7 @@ PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
 ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
-GET_PCS_PATH = "/playermenu/getpcs"
+GET_PCS_PATH = "/playermenu/getallpcs"
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
 NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
@@ -243,6 +250,7 @@ CURRENT_GOLD = "#ebb03b"
 BLOODIED_RED = "#8a0315"
 CABOOSE_RED = "#965959"
 BLACK = "#000000"
+REFRESH_GREEN = "#339933"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
 BUTTON_COLOR_3 = "#ff99ff"
@@ -367,6 +375,8 @@ function playerSelected(player, name, id)
         apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        UI.setAttribute(refreshCombatID, "active", "true")
+        UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
         UI.setAttribute(requestSkillID, "active", "true")
         UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
         checkIfAllPCsSelected()
@@ -451,6 +461,7 @@ function checkIfAllPCsSelected()
     if foundNames == numberOfPCs then
         addPlayerToggle()
         UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
+        UI.setAttribute(refreshCombatID, "color", PROMPT_BLUE)
         UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
     end
 end
@@ -507,6 +518,7 @@ function requestInitiative()
         UI.setAttribute(tealInitiativeID, "active", "true")
     end
     UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+    UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
 end
 
 function addPlayerInitiative(player, initTotal, id)
@@ -547,7 +559,7 @@ function endCombat()
     UI.setAttribute(endTurnID, "active", "false")
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
-    UI.setAttribute(refreshCombatID, "active", "false")
+    UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
     UI.setAttribute(addTimedEffectID, "active", "false")
     closeTimedEffects()
     closeTurnOrder()
@@ -754,7 +766,7 @@ function setUpTurnOrder()
 
     UI.setAttribute(endTurnGmID, "active", "true")
     UI.setAttribute(endCombatID, "active", "true")
-    UI.setAttribute(refreshCombatID, "active", "true")
+    UI.setAttribute(refreshCombatID, "color", REFRESH_GREEN)
     UI.setAttribute(addTimedEffectID, "active", "true")
 end
 
@@ -1591,10 +1603,10 @@ end
 -- Object XML Utility functions:
 
 function onObjectSpawn(object)
-    objectGuid = object.getGUID()
-    -- print("GUID: "..objectGuid)
-    isTabletopObject = true
-    setupObjectXmlUI()
+    -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function setupObjectXmlUI()

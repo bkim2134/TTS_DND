@@ -2,6 +2,11 @@
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
 
 
+-- Tabletop Object variables:
+
+isTabletopObject = false
+objectGuid = "12345"
+
 -- XML variable:
 
 XML_STRING = [[
@@ -15,7 +20,7 @@ PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
 ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
-GET_PCS_PATH = "/playermenu/getpcs"
+GET_PCS_PATH = "/playermenu/getallpcs"
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
 NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
@@ -101,6 +106,7 @@ CURRENT_GOLD = "#ebb03b"
 BLOODIED_RED = "#8a0315"
 CABOOSE_RED = "#965959"
 BLACK = "#000000"
+REFRESH_GREEN = "#339933"
 BUTTON_COLOR_1 = "#99ccff"
 BUTTON_COLOR_2 = "#3399ff"
 BUTTON_COLOR_3 = "#ff99ff"
@@ -225,6 +231,8 @@ function playerSelected(player, name, id)
         apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        UI.setAttribute(refreshCombatID, "active", "true")
+        UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
         UI.setAttribute(requestSkillID, "active", "true")
         UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
         checkIfAllPCsSelected()
@@ -309,6 +317,7 @@ function checkIfAllPCsSelected()
     if foundNames == numberOfPCs then
         addPlayerToggle()
         UI.setAttribute(requestInitiativeID, "color", PROMPT_BLUE)
+        UI.setAttribute(refreshCombatID, "color", PROMPT_BLUE)
         UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
     end
 end
@@ -365,6 +374,7 @@ function requestInitiative()
         UI.setAttribute(tealInitiativeID, "active", "true")
     end
     UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+    UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
 end
 
 function addPlayerInitiative(player, initTotal, id)
@@ -405,7 +415,7 @@ function endCombat()
     UI.setAttribute(endTurnID, "active", "false")
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
-    UI.setAttribute(refreshCombatID, "active", "false")
+    UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
     UI.setAttribute(addTimedEffectID, "active", "false")
     closeTimedEffects()
     closeTurnOrder()
@@ -612,7 +622,7 @@ function setUpTurnOrder()
 
     UI.setAttribute(endTurnGmID, "active", "true")
     UI.setAttribute(endCombatID, "active", "true")
-    UI.setAttribute(refreshCombatID, "active", "true")
+    UI.setAttribute(refreshCombatID, "color", REFRESH_GREEN)
     UI.setAttribute(addTimedEffectID, "active", "true")
 end
 
@@ -1449,10 +1459,10 @@ end
 -- Object XML Utility functions:
 
 function onObjectSpawn(object)
-    objectGuid = object.getGUID()
-    -- print("GUID: "..objectGuid)
-    isTabletopObject = true
-    setupObjectXmlUI()
+    -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function setupObjectXmlUI()
