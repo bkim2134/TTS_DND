@@ -4,8 +4,8 @@
 
 -- Tabletop Object variables:
 
-isTabletopObject = false
-objectGuid = "12345"
+isTabletopObject = false -- set to true if using an object to run the assistant
+objectGuid = "12345" -- also replace objectGuid with the spawned object's GUID
 
 -- XML variable:
 
@@ -146,6 +146,9 @@ threeViewed = {1,2,3} -- indexes of viewed effects
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
     -- replaceXmlGuid(XML_STRING, "12345") -- testing only
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function onUpdate()
@@ -421,7 +424,7 @@ function endCombat()
     closeTurnOrder()
 end
 
--- Party skill check functions:
+-- Party skill check functions (also for party saves):
 
 function requestPartySkillCheck()
     if  pcSelectorActive then
@@ -432,8 +435,8 @@ function requestPartySkillCheck()
     skillNameList = ""
     statsString = ""
     statsList = {}
-    broadcastToAll("It\'s time for a skill check!")
-    -- for each color, if a PC, activate that UI element to request skill
+    broadcastToAll("It\'s time for a party roll!")
+    -- for each color, if a PC, activate that UI element to request roll
     if isNotEmpty(playerColorMap.White) then
         UI.setAttribute(whiteSkillID, "active", "true")
     end
@@ -477,7 +480,7 @@ end
 function addNameToPartySkillPopup(skillName, skillTotal)
     skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
     table.insert(statsList,tonumber(skillTotal))
-    UI.setAttribute(skillTextID, "text", "Party Skill Results:\n\n"..skillNameList.."\n\nStatistics:\n"..getSkillStatistics())
+    UI.setAttribute(skillTextID, "text", "Party Results:\n\n"..skillNameList.."\n\nStatistics:\n"..getSkillStatistics())
     UI.setAttribute(skillTextID, "active", "true")
 
     UI.setAttribute(openPartySkillViewerID, "active", "true")
@@ -514,10 +517,10 @@ function getSkillStatistics()
 end
 
 function skillPopupToggle()
-    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Skill Viewer" then
+    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Roll Viewer" then
         activateClosePartySkillButton()
     else
-        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Roll Viewer")
         UI.setAttribute(openPartySkillViewerID, "color", PROMPT_BLUE)
         UI.setAttribute(skillTextID, "active", "false")
         UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
@@ -525,7 +528,7 @@ function skillPopupToggle()
 end
 
 function activateClosePartySkillButton()
-    UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
+    UI.setAttribute(openPartySkillViewerID, "text", "Close Party Roll Viewer")
     UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
     UI.setAttribute(skillTextID, "active", "true")
     UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
@@ -1458,12 +1461,9 @@ end
 
 -- Object XML Utility functions:
 
-function onObjectSpawn(object)
-    -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
-    if isTabletopObject then
-        setupObjectXmlUI()
-    end
-end
+-- function onObjectSpawn(object)
+--     -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
+-- end
 
 function setupObjectXmlUI()
     local newXML = replaceXmlGuid(XML_STRING, objectGuid)

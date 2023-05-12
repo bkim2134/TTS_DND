@@ -16,8 +16,8 @@
 
 -- Tabletop Object variables:
 
-isTabletopObject = true
-objectGuid = "12345"
+isTabletopObject = true -- set to true if using an object to run the assistant
+objectGuid = "12345" -- also replace objectGuid with the spawned object's GUID
 
 -- XML variable:
 
@@ -81,28 +81,28 @@ XML_STRING = [[
 
 <Panel id = "independentButtonsPanel">
     <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 150" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party roll list here</Button>
     <Button id = "add_timed_effect" rectAlignment = "MiddleLeft" offsetXY = "80 212" width = "200" height = "50" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
 </Panel>
 
 <Panel id = "gmPartySkillPanel" rectAlignment = "MiddleRight" offsetXY = "-210 -120" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick = "requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
-        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick = "skillPopupToggle"  active = "false">Close Party Skill Viewer</Button>
+        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick = "requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Roll</Button>
+        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick = "skillPopupToggle"  active = "false">Close Party Roll Viewer</Button>
     </VerticalLayout>
 </Panel>
 
 <Panel id = "partySkillPanel">
-    <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "greenSkill" visibility = "green" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "orangeSkill" visibility = "orange" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "tealSkill" visibility = "teal" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "brownSkill" visibility = "brown" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "pinkSkill" visibility = "pink" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "redSkill" visibility = "red" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "yellowSkill" visibility = "yellow" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "greenSkill" visibility = "green" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "orangeSkill" visibility = "orange" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "tealSkill" visibility = "teal" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "brownSkill" visibility = "brown" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "pinkSkill" visibility = "pink" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "redSkill" visibility = "red" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "yellowSkill" visibility = "yellow" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
 </Panel>
 
 <Panel id = "timedEffectsCreationPanel" offsetXY = "-150 -70" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
@@ -290,6 +290,9 @@ threeViewed = {1,2,3} -- indexes of viewed effects
 function onLoad()
     broadcastToAll("Loading the D&D Combat Assistant...")
     -- replaceXmlGuid(XML_STRING, "12345") -- testing only
+    if isTabletopObject then
+        setupObjectXmlUI()
+    end
 end
 
 function onUpdate()
@@ -565,7 +568,7 @@ function endCombat()
     closeTurnOrder()
 end
 
--- Party skill check functions:
+-- Party skill check functions (also for party saves):
 
 function requestPartySkillCheck()
     if  pcSelectorActive then
@@ -576,8 +579,8 @@ function requestPartySkillCheck()
     skillNameList = ""
     statsString = ""
     statsList = {}
-    broadcastToAll("It\'s time for a skill check!")
-    -- for each color, if a PC, activate that UI element to request skill
+    broadcastToAll("It\'s time for a party roll!")
+    -- for each color, if a PC, activate that UI element to request roll
     if isNotEmpty(playerColorMap.White) then
         UI.setAttribute(whiteSkillID, "active", "true")
     end
@@ -621,7 +624,7 @@ end
 function addNameToPartySkillPopup(skillName, skillTotal)
     skillNameList = skillNameList..skillName..": "..skillTotal.."\n"
     table.insert(statsList,tonumber(skillTotal))
-    UI.setAttribute(skillTextID, "text", "Party Skill Results:\n\n"..skillNameList.."\n\nStatistics:\n"..getSkillStatistics())
+    UI.setAttribute(skillTextID, "text", "Party Results:\n\n"..skillNameList.."\n\nStatistics:\n"..getSkillStatistics())
     UI.setAttribute(skillTextID, "active", "true")
 
     UI.setAttribute(openPartySkillViewerID, "active", "true")
@@ -658,10 +661,10 @@ function getSkillStatistics()
 end
 
 function skillPopupToggle()
-    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Skill Viewer" then
+    if UI.getAttribute(openPartySkillViewerID, "text") == "Open Party Roll Viewer" then
         activateClosePartySkillButton()
     else
-        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Skill Viewer")
+        UI.setAttribute(openPartySkillViewerID, "text", "Open Party Roll Viewer")
         UI.setAttribute(openPartySkillViewerID, "color", PROMPT_BLUE)
         UI.setAttribute(skillTextID, "active", "false")
         UI.setAttribute(requestSkillID, "color", PROMPT_BLUE)
@@ -669,7 +672,7 @@ function skillPopupToggle()
 end
 
 function activateClosePartySkillButton()
-    UI.setAttribute(openPartySkillViewerID, "text", "Close Party Skill Viewer")
+    UI.setAttribute(openPartySkillViewerID, "text", "Close Party Roll Viewer")
     UI.setAttribute(openPartySkillViewerID, "color", BUTTON_COLOR_6)
     UI.setAttribute(skillTextID, "active", "true")
     UI.setAttribute(requestSkillID, "color", SELECTED_GREY)
@@ -1602,12 +1605,9 @@ end
 
 -- Object XML Utility functions:
 
-function onObjectSpawn(object)
-    -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
-    if isTabletopObject then
-        setupObjectXmlUI()
-    end
-end
+-- function onObjectSpawn(object)
+--     -- print("GUID: "..object.getGUID()) -- this would reset the GUID every time a new object spawns, causing errors.
+-- end
 
 function setupObjectXmlUI()
     local newXML = replaceXmlGuid(XML_STRING, objectGuid)

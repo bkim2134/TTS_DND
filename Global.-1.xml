@@ -60,28 +60,28 @@
 
 <Panel id = "independentButtonsPanel">
     <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 150" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party skill list here</Button>
+    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "80 -20" width = "200" height = "400" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party roll list here</Button>
     <Button id = "add_timed_effect" rectAlignment = "MiddleLeft" offsetXY = "80 212" width = "200" height = "50" color = "#0474bf" fontStyle = "bold" fontSize = "16px" active = "false" onClick = "addTimedEffect" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Add Timed Effect</Button>
 </Panel>
 
 <Panel id = "gmPartySkillPanel" rectAlignment = "MiddleRight" offsetXY = "-210 -120" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
     <VerticalLayout spacing = "5" childForceExpandHeight = "false" childForceExpandWidth = "false" childAlignment = "middleCenter">
-        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick = "requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Skill Check</Button>
-        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick = "skillPopupToggle"  active = "false">Close Party Skill Viewer</Button>
+        <Button id = "requestPartySkill" minHeight = "50" minWidth = "200" visibility = "host" active = "false" onClick = "requestPartySkillCheck" color = "#ff6666" fontStyle = "bold" fontSize = "16px">Party Roll</Button>
+        <Button id = "openPartySkillViewer" minHeight = "30" minWidth = "160" visibility = "host" color = "#cc0000" onClick = "skillPopupToggle"  active = "false">Close Party Roll Viewer</Button>
     </VerticalLayout>
 </Panel>
 
 <Panel id = "partySkillPanel">
-    <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "greenSkill" visibility = "green" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "orangeSkill" visibility = "orange" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "tealSkill" visibility = "teal" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "brownSkill" visibility = "brown" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "pinkSkill" visibility = "pink" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "redSkill" visibility = "red" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "yellowSkill" visibility = "yellow" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
-    <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter skill total:"></InputField>
+    <InputField id = "blueSkill" visibility = "blue" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "purpleSkill" visibility = "purple" allowDragging = "true" active = "false" returnToOriginalPositionWhenReleased = "false" onSubmit = "addPlayerSkill" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "greenSkill" visibility = "green" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "orangeSkill" visibility = "orange" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "tealSkill" visibility = "teal" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "brownSkill" visibility = "brown" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "pinkSkill" visibility = "pink" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "redSkill" visibility = "red" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "yellowSkill" visibility = "yellow" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
+    <InputField id = "whiteSkill" visibility = "white" onSubmit = "addPlayerSkill" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" position = "0 -40 0" placeholder = "Enter total:"></InputField>
 </Panel>
 
 <Panel id = "timedEffectsCreationPanel" offsetXY = "-150 -70" width = "0" height = "0" raycastTarget = "false" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
