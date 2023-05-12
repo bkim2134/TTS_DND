@@ -4,8 +4,8 @@
 
 -- Tabletop Object variables:
 
-isTabletopObject = false
-objectGuid = "12345"
+isTabletopObject = false -- set to true if using an object to run the assistant
+objectGuid = "12345" -- also replace objectGuid with the spawned object's GUID
 
 -- XML variable:
 
