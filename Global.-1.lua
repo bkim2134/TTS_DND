@@ -121,6 +121,7 @@ BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
 CR_STRING = [[%pCR%s]]
 CR_STRING_2 = [[%p%d]]
+CR_STRING_3 = [[%p]] -- any punctuation
 XML_REPLACE = [[onClick%s=%s"]]
 XML_REPLACE_2 = [[onEndEdit%s=%s"]]
 XML_REPLACE_3 = [[onSubmit%s=%s"]]
@@ -616,7 +617,7 @@ function setNextTurn(nextPlayer)
 end
 
 function announceTime(currRound)
-    print("The current time is: "..currRound)
+    -- print("The current time is: "..currRound)
     setUpTurnOrder() -- refresh on end turn
 end
 
@@ -694,10 +695,18 @@ end
 
 function getToCurrChar()
     if isCurrentCharacterInInitList() then
-        while true do
-            if isCurrChar(initiativeOrderList[fiveViewed[1]].Name) then return end
-            turnOrderLeft()
+        if pcall(function () 
+            while true do
+                if isCurrChar(initiativeOrderList[fiveViewed[1]].Name) then return end
+                turnOrderLeft()
+            end
+        end) then 
+            -- print("no failure")
+        else 
+            -- print("failure caught")
+            print("There was a problem getting the current character.")
         end
+        
     else
         print("There is no current character. End a turn or refresh the server to find the current character.")
     end
@@ -1318,12 +1327,20 @@ function cutOutCRtext(str)
     r, s = str:find(CR_STRING_2)
     if r ~= nil then -- numbered npc, add the number
         local stringA = string.sub(str, 1, p-1)
+        -- print("stringA: "..stringA)
         local stringB = string.sub(str, r+1, string.len(str))
+        -- print("stringB: "..stringB)
+        t, u = stringB:find(CR_STRING_3) -- fix for (CR x.x)
+        if t ~= nil then
+            stringB = string.sub(stringB, t+1, string.len(stringB))
+            -- print("new stringB: "..stringB)
+        end
         str = stringA..stringB
     else -- un-numbered npc
         str = string.sub(str, 1, p-2) -- cut off the space too
     end
     -- print("non CR str: "..str)
+
     return str
 end
 
