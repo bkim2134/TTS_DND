@@ -1,5 +1,6 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
+-- Updated 6/1/2023
 
 
 -- Tabletop Object variables:
