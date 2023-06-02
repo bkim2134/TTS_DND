@@ -1,6 +1,6 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
--- Updated 6/1/2023
+-- Updated 6/2/2023 (Version 1.0)
 
 
 -- Tabletop Object variables:
@@ -884,6 +884,15 @@ function addTimedEffect(player)
     UI.setAttribute(addTimedEffectNameID, "active", "true")
     UI.setAttribute(timedEffectEffectID, "active", "true")
     UI.setAttribute(timedEffectTextID, "active", "true")
+
+    UI.setAttribute(addTimedEffectNameID, "text", "") -- blank out the entries
+    UI.setAttribute(addTimedEffectDurationID, "text", "")
+    UI.setAttribute(addTimedEffectDurationMinutesID, "text", "")
+    UI.setAttribute(addTimedEffectDurationHoursID, "text", "")
+    UI.setAttribute(addTimedEffectDurationDaysID, "text", "")
+    UI.setAttribute(addTimedEffectTargetsID, "text", "")
+    UI.setAttribute(timedEffectEffectID, "text", "")
+
     UI.setAttribute(cancelTimedEffectID, "active", "true")
     UI.setAttribute(confirmTimedEffectID, "active", "true")
     UI.setAttribute(addTimedEffectID, "visibility", "host") -- hide the button (host has cancel override)
@@ -961,9 +970,14 @@ function confirmTimedEffect(player, id)
         broadcastToColor("You cannot create a timed effect without a duration!", player.color)
         return
     end
-    timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
-    -- print("timedEffectListToSend: "..timedEffectListToSend)
-    apiAddTimedEffect(timedEffectListToSend, player.color)
+    if isNotEmpty(effectName) then
+        timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
+        -- print("timedEffectListToSend: "..timedEffectListToSend)
+        apiAddTimedEffect(timedEffectListToSend, player.color)
+    else
+        broadcastToColor("You cannot create a timed effect without a name!", player.color)
+        return
+    end
 end
 
 function receiveTimedEffects(timedEffectsStr)
@@ -1357,7 +1371,9 @@ function convertRoundsStrToTimeLeft(durationStringRounds)
     if fullTimeNum > 0 then
         if fullTimeNum >= 5256000 then
             years = math.floor(fullTimeNum / 5256000)
+            -- print("fullTimeNum pre mod 5256000: "..fullTimeNum)
             fullTimeNum = fullTimeNum % 5256000
+            -- print("fullTimeNum post mod 5256000: "..fullTimeNum)
         end
         if fullTimeNum >= 14400 then
             days = math.floor(fullTimeNum / 14400)
@@ -1365,12 +1381,24 @@ function convertRoundsStrToTimeLeft(durationStringRounds)
         end
         if fullTimeNum >= 600 then
             hours = math.floor(fullTimeNum / 600)
+            -- print("fullTimeNum pre mod 600: "..fullTimeNum)
             fullTimeNum = fullTimeNum % 600
+            -- print("fullTimeNum post mod 600: "..fullTimeNum)
         end
         if fullTimeNum >= 10 then
             minutes = math.floor(fullTimeNum / 10)
             rounds = fullTimeNum % 10
         end
+        if fullTimeNum < 10 then
+            rounds = fullTimeNum
+        end
+
+        -- print("time conversion of "..fullTimeNum)
+        -- print("years: "..years)
+        -- print("days: "..days)
+        -- print("hours: "..hours)
+        -- print("minutes: "..minutes)
+        -- print("rounds: "..rounds)
 
         local yearsStr = ""
         local daysStr = ""
