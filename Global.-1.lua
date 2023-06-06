@@ -1,6 +1,6 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
--- Updated 6/2/2023 (Version 1.0)
+-- Updated 6/5/2023 (Version 1.1)
 
 
 -- Tabletop Object variables:
@@ -21,7 +21,7 @@ PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
 ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
-GET_PCS_PATH = "/playermenu/getallpcs"
+GET_PCS_PATH = "/playermenu/getpcs" -- use /getallpcs to also get PCs who are not in combat (not on the map)
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
 NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
@@ -82,6 +82,18 @@ displayTimedEffectsTextID = "text_button_7"
 timedEffect1ID = "text_button_8"
 timedEffect2ID = "text_button_9"
 timedEffect3ID = "text_button_10"
+timedEffect4ID = "text_button_15"
+timedEffect5ID = "text_button_16"
+timedEffect1TargetsID = "text_button_32"
+timedEffect1TimeLeftID = "text_button_33"
+timedEffect2TargetsID = "text_button_34"
+timedEffect2TimeLeftID = "text_button_35"
+timedEffect3TargetsID = "text_button_36"
+timedEffect3TimeLeftID = "text_button_37"
+timedEffect4TargetsID = "text_button_38"
+timedEffect4TimeLeftID = "text_button_39"
+timedEffect5TargetsID = "text_button_40"
+timedEffect5TimeLeftID = "text_button_41"
 timedEffectsDownID = "timed_effects_down_button"
 timedEffectsUpID = "timed_effects_up_button"
 initTextID = "text_button_3"
@@ -93,19 +105,40 @@ initSlot5ID = "text_button_14"
 turnLeftButtonID = "turn_left_button"
 turnRightButtonID = "turn_right_button"
 ipSelectorPanelID = "ipSelectorPanel"
+getPlayersButtonID = "get_players_button"
+timedEffect1EffectLabelID = "text_button_17"
+timedEffect1TargetsLabelID = "text_button_18"
+timedEffect1TimeLeftLabelID = "text_button_19"
+timedEffect2EffectLabelID = "text_button_20"
+timedEffect2TargetsLabelID = "text_button_21"
+timedEffect2TimeLeftLabelID = "text_button_22"
+timedEffect3EffectLabelID = "text_button_23"
+timedEffect3TargetsLabelID = "text_button_24"
+timedEffect3TimeLeftLabelID = "text_button_25"
+timedEffect4EffectLabelID = "text_button_26"
+timedEffect4TargetsLabelID = "text_button_27"
+timedEffect4TimeLeftLabelID = "text_button_28"
+timedEffect5EffectLabelID = "text_button_29"
+timedEffect5TargetsLabelID = "text_button_30"
+timedEffect5TimeLeftLabelID = "text_button_31"
+closeTimedEffectViewerID = "closeTimedEffectViewer"
 
 -- Game constants:
 
 SELECTED_GREY = "#787878"
 PROMPT_BLUE = "#0474bf"
 NPC_PURPLE = "#9B59B6"
+NPC_PURPLEs = "#9B59B6|#9B59B6|#9B59B6|#9B59B6"
 DEFAULT_RED_PINK = "#ff6666"
 DEFAULT_BLUE_GREY = "#5c7091"
+DEFAULT_BLUE_GREYs = "#5c7091|#5c7091|#5c7091|#5c7091"
 BUTTON_TEXT_BLUE_GREY = "#83a2d4"
 DEFAULTY_GREY = "#d1d1d1"
-CURRENT_GOLD = "#ebb03b"
+-- CURRENT_GOLD = "#ebb03b"
+CURRENT_GOLDs = "#ebb03b|#ebb03b|#ebb03b|#ebb03b"
 BLOODIED_RED = "#8a0315"
-CABOOSE_RED = "#965959"
+-- CABOOSE_RED = "#CD5C5C"
+CABOOSE_REDs = "#CD5C5C|#CD5C5C|#CD5C5C|#CD5C5C"
 BLACK = "#000000"
 REFRESH_GREEN = "#339933"
 BUTTON_COLOR_1 = "#99ccff"
@@ -120,15 +153,16 @@ BUTTON_COLOR_9 = "#00ffcc"
 BUTTON_COLOR_10 = "#009933"
 BUTTON_COLOR_11 = "#ebebeb"
 BUTTON_COLOR_12 = "#bdbdbd"
+EFFECT_LABEL_COLORs = "#42BE76|#42BE76|#42BE76|#42BE76"
+TARGETS_LABEL_COLORs = "#C0392B|#C0392B|#C0392B|#C0392B"
+TIME_LEFT_LABEL_COLORs = "#0474bf|#0474bf|#0474bf|#0474bf" -- PROMPT_BLUEs
+
 CR_STRING = [[%pCR%s]]
 CR_STRING_2 = [[%p%d]]
 CR_STRING_3 = [[%p]] -- any punctuation
 XML_REPLACE = [[onClick%s=%s"]]
 XML_REPLACE_2 = [[onEndEdit%s=%s"]]
 XML_REPLACE_3 = [[onSubmit%s=%s"]]
--- ATTRIBUTES = "attributes"
--- ID = "id"
--- CHILDREN = "children"
 
 -- Game variables:
 
@@ -166,8 +200,7 @@ function storeIPAddress(player, ipAddress, id)
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
     UI.setAttribute(changeIPAddressID, "text", IP_ADDRESS)
-    -- UI.setAttribute(ipSelectorPanelID, "height", "70")
-    loadPlayerData()
+    UI.setAttribute(getPlayersButtonID, "active", "true") -- load players button that calls loadPlayerData()
 end
 
 function changeIPAddress()
@@ -185,16 +218,22 @@ function makePcList(pcListFromServer)
     numberOfPCs = #(pcList)
     displayPcs()
     UI.setAttribute(addAPlayerID, "active", "true")
+    UI.setAttribute(getPlayersButtonID, "color", SELECTED_GREY)
+    UI.setAttribute(addAPlayerID, "text", "Close Player Selector")
+    UI.setAttribute(addAPlayerID, "color", BUTTON_COLOR_6)
+    
 end
 
 function addPlayerToggle()
     if UI.getAttribute(addAPlayerID, "text") == "Open Player Selector" then
         UI.setAttribute(addAPlayerID, "text", "Close Player Selector")
         UI.setAttribute(addAPlayerID, "color", BUTTON_COLOR_6)
+        UI.setAttribute(getPlayersButtonID, "color", SELECTED_GREY)
         displayPcs()
     else
         UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
         UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE)
+        UI.setAttribute(getPlayersButtonID, "color", REFRESH_GREEN)
         closePcSelector()
 
     end
@@ -236,6 +275,7 @@ function playerSelected(player, name, id)
         apiAddToMap(name)
         UI.setAttribute(requestInitiativeID, "active", "true")
         UI.setAttribute(requestInitiativeID, "color", SELECTED_GREY)
+        UI.setAttribute(addTimedEffectID, "active", "true") -- create timed effects before all players chosen
         UI.setAttribute(refreshCombatID, "active", "true")
         UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
         UI.setAttribute(requestSkillID, "active", "true")
@@ -340,6 +380,7 @@ function requestInitiative()
     if  pcSelectorActive then
         UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
         UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE) -- double added to cover an error
+        UI.setAttribute(getPlayersButtonID, "color", REFRESH_GREEN)
         closePcSelector()
     end
     numberInitspopulated = 0
@@ -421,7 +462,7 @@ function endCombat()
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
     UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
-    UI.setAttribute(addTimedEffectID, "active", "false")
+    -- UI.setAttribute(addTimedEffectID, "active", "false")
     closeTimedEffects()
     closeTurnOrder()
 end
@@ -432,6 +473,7 @@ function requestPartySkillCheck()
     if  pcSelectorActive then
         UI.setAttribute(addAPlayerID, "text", "Open Player Selector")
         UI.setAttribute(addAPlayerID, "color", PROMPT_BLUE)
+        UI.setAttribute(getPlayersButtonID, "color", REFRESH_GREEN)
         closePcSelector()
     end
     skillNameList = ""
@@ -636,7 +678,7 @@ function displayTurnOrder()
 end
 
 function receiveInitiativeStr(initiativeStr)
-    -- print("received: "..initiativeStr)
+    print("received: "..initiativeStr)
     initiativeOrderList = {{Name="",Bloodied=false,Armor=0,Resistances="",Reactions=""}}
     initiativeOrderList = getInitOrderListFromJsonStr(initiativeStr)
 end
@@ -657,9 +699,8 @@ function getInitOrderListFromJsonStr(jsonStr)
         tempInitList.Armor = tonumber(responseBody[i]["ac"])
         tempInitList.Resistances = responseBody[i]["resistances"]
         tempInitList.Reactions = responseBody[i]["reactions"]
-        -- print(tempInitList.Effect)
+        -- print("tempInitList name: "..tempInitList.Name)
         table.insert(initList,tempInitList)
-        -- print(effectsList[i].Name)
     end
     return initList
 end
@@ -674,9 +715,11 @@ function checkNumberOfInits()
     end
     UI.setAttribute(initTextID, "active", "true")
     UI.setAttribute(initTextID, "text", "Initiatve Order ("..numberOfPeopleInInitiative.." characters):")
+    table.insert(initiativeOrderList, {Name="↻",Bloodied=false,Armor=0,Resistances="",Reactions=""}) -- round end
+    numberOfPeopleInInitiative = numberOfPeopleInInitiative + 1
     setBlankTurnsInactive()
     getToCurrChar()
-    refresh5Inits() 
+    refresh5Inits()
 end
 
 function setBlankTurnsInactive()
@@ -722,7 +765,7 @@ function isCurrentCharacterInInitList()
 	return false
 end
 
-function turnOrderLeft()
+function turnOrderRight() -- switched L/R names to make scrolling more natural
     local firstTurnNum = fiveViewed[1]
     local secondTurnNum = fiveViewed[2]
     local thirdTurnNum = fiveViewed[3]
@@ -755,7 +798,7 @@ function turnOrderLeft()
     refresh5Inits()
 end
 
-function turnOrderRight()
+function turnOrderLeft() -- switched L/R names to make scrolling more natural
     local firstTurnNum = fiveViewed[1]
     local secondTurnNum = fiveViewed[2]
     local thirdTurnNum = fiveViewed[3]
@@ -822,24 +865,38 @@ end
 function makeInitTextButton(initSlotID, initChar)
     -- print("activating "..initSlotID)
     UI.setAttribute(initSlotID, "active", "true")
-    local charName = initChar.Name
+    local charName
+    if pcall(function () 
+        charName = initChar.Name
+    end) then 
+        -- print("no failure")
+    else 
+        -- print("failure caught")
+        charName = "Nobody"
+        print("There was a problem getting the current character name.")
+    end
     -- print("name: "..charName)
     UI.setAttribute(initSlotID, "text", charName)
+    UI.setAttribute(initSlotID, "resizeTextForBestFit", "false")
    
-    if isCurrChar(charName) then
-        UI.setAttribute(initSlotID, "color", CURRENT_GOLD) -- color gold
+    if charName == "↻" then
+        UI.setAttribute(initSlotID, "colors", CABOOSE_REDs) -- color end red
+        UI.setAttribute(initSlotID, "resizeTextForBestFit", "true")
     else
-        if isNextChar(charName) then
-            UI.setAttribute(initSlotID, "color", NPC_PURPLE) -- color purple
+        if isCurrChar(charName) then
+            UI.setAttribute(initSlotID, "colors", CURRENT_GOLDs) -- color gold
         else
-            --  print("setting color of initBox to DEFAULT_BLUE_GREY")
-            UI.setAttribute(initSlotID, "color", DEFAULT_BLUE_GREY) -- color default, text default
+            if isNextChar(charName) then
+                UI.setAttribute(initSlotID, "colors", NPC_PURPLEs) -- color purple
+            else
+                UI.setAttribute(initSlotID, "colors", DEFAULT_BLUE_GREYs) -- color default, text default
+            end
         end
-    end
-    if initChar.Bloodied then
-        UI.setAttribute(initSlotID, "textColor", BLOODIED_RED) -- red text
-    else
-        UI.setAttribute(initSlotID, "textColor", BLACK)
+        if initChar.Bloodied then
+            UI.setAttribute(initSlotID, "textColor", BLOODIED_RED) -- red text
+        else
+            UI.setAttribute(initSlotID, "textColor", BLACK)
+        end
     end
 end
 
@@ -866,8 +923,10 @@ end
 -- Timed Effect functions:
 
 function addTimedEffect(player)
-    broadcastToAll(findPlayerNameFromColor(player.color).." is adding a timed effect...")
+    local playerName = findPlayerNameFromColor(player.color)
+    broadcastToAll(playerName.." is adding a timed effect...")
     setTimedEffectColor(player.color)
+    playerNameLabel = playerName.."\'s "
     effectName = ""
     effectTargets = ""
     effectDuration = ""
@@ -895,7 +954,7 @@ function addTimedEffect(player)
 
     UI.setAttribute(cancelTimedEffectID, "active", "true")
     UI.setAttribute(confirmTimedEffectID, "active", "true")
-    UI.setAttribute(addTimedEffectID, "visibility", "host") -- hide the button (host has cancel override)
+    UI.setAttribute(addTimedEffectID, "visibility", "black") -- hide the button (GM has cancel override)
     UI.setAttribute(addTimedEffectID, "text", "Cancel Timed Effect")
     if isTabletopObject then
         UI.setAttribute(addTimedEffectID, "onClick", objectGuid.."/closeTimedEffectCreator")
@@ -936,7 +995,7 @@ function closeTimedEffectCreator()
     else
         UI.setAttribute(addTimedEffectID, "onClick", "addTimedEffect")
     end
-    setTimedEffectColor("host")
+    setTimedEffectColor("black") -- this may be redundant but set to GM only just in case
     UI.setAttribute(addTimedEffectID, "color", PROMPT_BLUE)
 end
 
@@ -971,7 +1030,7 @@ function confirmTimedEffect(player, id)
         return
     end
     if isNotEmpty(effectName) then
-        timedEffectListToSend = "{\"name\":\""..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
+        timedEffectListToSend = "{\"name\":\""..playerName.."\'s "..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
         -- print("timedEffectListToSend: "..timedEffectListToSend)
         apiAddTimedEffect(timedEffectListToSend, player.color)
     else
@@ -982,7 +1041,7 @@ end
 
 function receiveTimedEffects(timedEffectsStr)
     -- print("received: "..timedEffectsStr)
-    timedEffectsList = {{Name="",Effect="",Targets="",Duration=""}}
+    timedEffectsList = {{Name="",Effect="",Targets="",Duration="",Number=0}}
     timedEffectsList = getTimedEffectListFromJson(timedEffectsStr)
     -- print(timedEffectsList[1].Name)
 end
@@ -991,7 +1050,7 @@ function getTimedEffectListFromJson(timedEffectJsonStr)
     local effectsList = {}
     local responseBody = JSON.decode(timedEffectJsonStr)
     for i, v in pairs( responseBody ) do
-        local tempEffectList = {Name="",Effect="",Targets="",Duration=""}
+        local tempEffectList = {Name="",Effect="",Targets="",Duration="",Number=i}
         tempEffectList.Name = responseBody[i]["name"]
         tempEffectList.Effect = responseBody[i]["effect"]
         tempEffectList.Targets = responseBody[i]["targets"]
@@ -1015,38 +1074,60 @@ function checkNumberOfEffects()
         closeTimedEffects()
         return
     end
+    UI.setAttribute(closeTimedEffectViewerID, "active", "true")
+    UI.setAttribute(closeTimedEffectViewerID, "text", "Close Timed Effect Viewer")
+    UI.setAttribute(closeTimedEffectViewerID, "color", BUTTON_COLOR_6)
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
     UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
+    table.insert(timedEffectsList, {Name="Timed Effects End",Effect="",Targets="",Duration="",Number=0})
+    numberOfEffects = numberOfEffects + 1
     setBlankTimedEffectsInactive()
-    threeViewed = {1,2,3}
+    threeViewed = {1,2,3,4,5} -- threeViewed does 5 now (yes its confusing i'll change the name later)
     refresh3TimedEffects() 
 end
 
 function setBlankTimedEffectsInactive()
-    if 0 < numberOfEffects and numberOfEffects < 3 then
-        UI.setAttribute(timedEffect3ID, "active", "false")
-        if numberOfEffects == 1 then
-            UI.setAttribute(timedEffect2ID, "active", "false")
+    if 0 < numberOfEffects and numberOfEffects < 5 then
+        UI.setAttribute(timedEffect5ID, "active", "false")
+        if 0 < numberOfEffects and numberOfEffects < 4 then
+            UI.setAttribute(timedEffect4ID, "active", "false")
+            if 0 < numberOfEffects and numberOfEffects < 3 then
+                UI.setAttribute(timedEffect3ID, "active", "false")
+                if numberOfEffects == 1 then
+                    UI.setAttribute(timedEffect2ID, "active", "false")
+                end
+            end
         end
     end
 end
 
-function timedEffectsUp()
+function timedEffectsDown() -- also switched up/down for scroll clarity
     local firstEffectNum = threeViewed[1]
     local secondEffectNum = threeViewed[2]
     local thirdEffectNum = threeViewed[3]
-    -- print("up. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum)
+    local fourthEffectNum = threeViewed[4]
+    local fifthEffectNum = threeViewed[5]
 
-    if thirdEffectNum == numberOfEffects then
-        threeViewed = {secondEffectNum, thirdEffectNum, 1}
+    -- print("up. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum..","..fourthEffectNum..","..fifthEffectNum)
+
+    if fifthEffectNum == numberOfEffects then
+        threeViewed = {secondEffectNum, thirdEffectNum, fourthEffectNum, fifthEffectNum, 1}
     else
-        if secondEffectNum == numberOfEffects then
-            threeViewed = {secondEffectNum, 1, 2}
+        if fourthEffectNum == numberOfEffects then
+            threeViewed = {secondEffectNum, thirdEffectNum, fourthEffectNum, 1, 2}
         else
-            if firstEffectNum == numberOfEffects then -- full reset
-                threeViewed = {1,2,3}
-            else -- regular case
-                threeViewed = {firstEffectNum + 1, secondEffectNum + 1, thirdEffectNum + 1}
+            if thirdEffectNum == numberOfEffects then
+                threeViewed = {secondEffectNum, thirdEffectNum, 1, 2, 3}
+            else
+                if secondEffectNum == numberOfEffects then
+                    threeViewed = {secondEffectNum, 1, 2, 3, 4}
+                else
+                    if firstEffectNum == numberOfEffects then
+                        threeViewed = {1,2,3,4,5} -- full reset
+                    else
+                        threeViewed = {firstEffectNum + 1, secondEffectNum + 1, thirdEffectNum + 1, fourthEffectNum + 1, fifthEffectNum + 1} -- regular case
+                    end
+                end
             end
         end
     end
@@ -1054,22 +1135,33 @@ function timedEffectsUp()
     refresh3TimedEffects()
 end
 
-function timedEffectsDown()
+function timedEffectsUp() -- also switched up/down for scroll clarity
     local firstEffectNum = threeViewed[1]
     local secondEffectNum = threeViewed[2]
     local thirdEffectNum = threeViewed[3]
-    -- print("down. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum)
+    local fourthEffectNum = threeViewed[4]
+    local fifthEffectNum = threeViewed[5]
+
+    -- print("down. threeViewed numbers: "..firstEffectNum..","..secondEffectNum..","..thirdEffectNum..","..fourthEffectNum..","..fifthEffectNum)
 
     if firstEffectNum == 1 then
-        threeViewed = {numberOfEffects, 1, 2}
+        threeViewed = {numberOfEffects, 1, 2, 3, 4}
     else
         if secondEffectNum == 1 then
-            threeViewed = {numberOfEffects - 1, numberOfEffects, 1}
+            threeViewed = {numberOfEffects - 1,numberOfEffects, 1, 2, 3}
         else
             if thirdEffectNum == 1 then
-                threeViewed = {numberOfEffects - 2, numberOfEffects - 1, numberOfEffects}
-            else -- regular case
-                threeViewed = {firstEffectNum - 1, secondEffectNum - 1, thirdEffectNum - 1}
+                threeViewed = {numberOfEffects - 2, numberOfEffects - 1, numberOfEffects, 1, 2}
+            else 
+                if fourthEffectNum == 1 then
+                    threeViewed = {numberOfEffects - 3, numberOfEffects - 2, numberOfEffects - 1, numberOfEffects, 1}
+                else
+                    if fifthEffectNum == 1 then
+                        threeViewed = {numberOfEffects - 4, numberOfEffects - 3, numberOfEffects - 2, numberOfEffects - 1, numberOfEffects}
+                    else
+                        threeViewed = {firstEffectNum - 1, secondEffectNum - 1, thirdEffectNum - 1, fourthEffectNum - 1, fifthEffectNum - 1} -- regular case 
+                    end
+                end
             end
         end
     end
@@ -1081,61 +1173,176 @@ function refresh3TimedEffects()
     local first = threeViewed[1]
     local second = threeViewed[2]
     local third = threeViewed[3]
+    local fourth = threeViewed[4]
+    local fifth = threeViewed[5]
 
     -- printNestedTable(timedEffectsList)
 
-    if numberOfEffects > 3 then -- have to choose 3 based on the buttons
-        cabooseList = timedEffectsList[numberOfEffects]
+    if numberOfEffects >= 1 then
+        makeTimedEffectTextButton(1, timedEffectsList[first])
+    end
+    if numberOfEffects >= 2 then
+        makeTimedEffectTextButton(2, timedEffectsList[second])
+    end
+    if numberOfEffects >= 3 then
+        makeTimedEffectTextButton(3, timedEffectsList[third])
+    end
+    if numberOfEffects >= 4 then
+        makeTimedEffectTextButton(4, timedEffectsList[fourth])
+    end
+    if numberOfEffects >= 5 then
+        makeTimedEffectTextButton(5, timedEffectsList[fifth])
+    end
+
+    if numberOfEffects > 5 then -- have to choose 5 based on the buttons
         UI.setAttribute(timedEffectsUpID, "active", "true")
         UI.setAttribute(timedEffectsDownID, "active", "true")
     else
-        cabooseList = nil
         UI.setAttribute(timedEffectsUpID, "active", "false")
         UI.setAttribute(timedEffectsDownID, "active", "false")
     end
-
-    if numberOfEffects >= 1 then
-        makeTimedEffectTextButton(timedEffect1ID, timedEffectsList[first])
-    end
-    if numberOfEffects >= 2 then
-        makeTimedEffectTextButton(timedEffect2ID, timedEffectsList[second])
-    end
-    if numberOfEffects >= 3 then
-        makeTimedEffectTextButton(timedEffect3ID, timedEffectsList[third])
-    end
 end
 
-function makeTimedEffectTextButton(timeEffectSlotID, tempTimedEffectList)
-    -- print("activating timed effect: "..timeEffectSlotID..", table = "..tostring(tempTimedEffectList))
-    UI.setAttribute(timeEffectSlotID, "active", "true")
-    local text = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect.."\nTargets: "..tempTimedEffectList.Targets.."\nTime left: "..tempTimedEffectList.Duration
-    UI.setAttribute(timeEffectSlotID, "text", text)
-    if cabooseList == tempTimedEffectList and tempTimedEffectList ~= nil then -- caboose found
-        UI.setAttribute(timeEffectSlotID, "color", CABOOSE_RED)
+function makeTimedEffectTextButton(timedEffectNumber, tempTimedEffectList)
+    local timedEffectID = ""
+    local timedEffectTargetsID = ""
+    local timedEffectsTimeLeftID = ""
+    local timedEffectLabelID = ""
+    local timedEffectTargetsLabelID = ""
+    local timedEffectsTimeLeftLabelID = ""
+
+    if timedEffectNumber == 5 then
+        timedEffectID = timedEffect5ID
+        timedEffectTargetsID = timedEffect5TargetsID
+        timedEffectsTimeLeftID = timedEffect5TimeLeftID
+        timedEffectLabelID = timedEffect5EffectLabelID
+        timedEffectTargetsLabelID = timedEffect5TimeLeftLabelID
+        timedEffectsTimeLeftLabelID = timedEffect5TargetsLabelID
     else
-        UI.setAttribute(timeEffectSlotID, "color", DEFAULT_BLUE_GREY)
+        if timedEffectNumber == 4 then
+            timedEffectID = timedEffect4ID
+            timedEffectTargetsID = timedEffect4TargetsID
+            timedEffectsTimeLeftID = timedEffect4TimeLeftID
+            timedEffectLabelID = timedEffect4EffectLabelID
+            timedEffectTargetsLabelID = timedEffect4TimeLeftLabelID
+            timedEffectsTimeLeftLabelID = timedEffect4TargetsLabelID
+        else
+            if timedEffectNumber == 3 then
+                timedEffectID = timedEffect3ID
+                timedEffectTargetsID = timedEffect3TargetsID
+                timedEffectsTimeLeftID = timedEffect3TimeLeftID
+                timedEffectLabelID = timedEffect3EffectLabelID
+                timedEffectTargetsLabelID = timedEffect3TimeLeftLabelID
+                timedEffectsTimeLeftLabelID = timedEffect3TargetsLabelID
+            else
+                if timedEffectNumber == 2 then
+                    timedEffectID = timedEffect2ID
+                    timedEffectTargetsID = timedEffect2TargetsID
+                    timedEffectsTimeLeftID = timedEffect2TimeLeftID
+                    timedEffectLabelID = timedEffect2EffectLabelID
+                    timedEffectTargetsLabelID = timedEffect2TimeLeftLabelID
+                    timedEffectsTimeLeftLabelID = timedEffect2TargetsLabelID
+                else
+                    if timedEffectNumber == 1 then
+                        timedEffectID = timedEffect1ID
+                        timedEffectTargetsID = timedEffect1TargetsID
+                        timedEffectsTimeLeftID = timedEffect1TimeLeftID
+                        timedEffectLabelID = timedEffect1EffectLabelID
+                        timedEffectTargetsLabelID = timedEffect1TimeLeftLabelID
+                        timedEffectsTimeLeftLabelID = timedEffect1TargetsLabelID
+                    end
+                end
+            end
+        end
+    end
+
+    if tempTimedEffectList.Name == "Timed Effects End" then
+        UI.setAttribute(timedEffectID, "text", "↻")
+        UI.setAttribute(timedEffectID, "colors", CABOOSE_REDs) -- color end red
+        UI.setAttribute(timedEffectID, "resizeTextForBestFit", "true")
+        UI.setAttribute(timedEffectID, "minHeight", "110")
+        UI.setAttribute(timedEffectID, "minWidth", "460")
+        UI.setAttribute(timedEffectTargetsID, "active", "false")
+        UI.setAttribute(timedEffectsTimeLeftID, "active", "false")
+        UI.setAttribute(timedEffectLabelID, "active", "false")
+        UI.setAttribute(timedEffectTargetsLabelID, "active", "false")
+        UI.setAttribute(timedEffectsTimeLeftLabelID, "active", "false")
+    else
+        UI.setAttribute(timedEffectID, "active", "true")
+        local effectText = tempTimedEffectList.Name..": "..tempTimedEffectList.Effect
+        UI.setAttribute(timedEffectID, "text", effectText)
+        UI.setAttribute(timedEffectID, "colors", DEFAULT_BLUE_GREYs)
+        UI.setAttribute(timedEffectID, "minHeight", "50")
+        UI.setAttribute(timedEffectID, "minWidth", "360")
+        UI.setAttribute(timedEffectID, "resizeTextForBestFit", "false")
+        UI.setAttribute(timedEffectTargetsID, "active", "true")
+        local effectTargetsText = tempTimedEffectList.Targets
+        UI.setAttribute(timedEffectTargetsID, "text", effectTargetsText)
+        UI.setAttribute(timedEffectsTimeLeftID, "active", "true")
+        local effectTimeLeftText = tempTimedEffectList.Duration
+        UI.setAttribute(timedEffectsTimeLeftID, "text", effectTimeLeftText)
+        UI.setAttribute(timedEffectLabelID, "active", "true")
+        local effectLabeltext = "Effect "..tostring(tempTimedEffectList.Number)..":"
+        UI.setAttribute(timedEffectLabelID, "text", effectLabeltext)
+        UI.setAttribute(timedEffectTargetsLabelID, "active", "true")
+        UI.setAttribute(timedEffectsTimeLeftLabelID, "active", "true")
     end
 end
 
-function printNestedTable(inputTable) -- for testing & debugging only
-    print("inputTable: "..tostring(inputTable))
-    if inputTable == nil or #(inputTable) == 0 then return end
-     for tableNum,tempTable in ipairs(inputTable) do
-        print("table "..tableNum..": "..tostring(tempTable))
-        for itemNum,item in pairs(tempTable) do
-            print("item "..itemNum..": "..item)
-        end
-     end
+function timedEffectViewToggle()
+    if UI.getAttribute(closeTimedEffectViewerID, "text") == "Open Timed Effect Viewer" then -- josh only 2 toher ways to open it are refesh init & add timed effect
+        UI.setAttribute(closeTimedEffectViewerID, "text", "Close Timed Effect Viewer")
+        UI.setAttribute(closeTimedEffectViewerID, "color", BUTTON_COLOR_6)
+        openTimedEffects()
+    else
+        UI.setAttribute(closeTimedEffectViewerID, "text", "Open Timed Effect Viewer")
+        UI.setAttribute(closeTimedEffectViewerID, "color", PROMPT_BLUE)
+        closeTimedEffects()
+    end    
+end
+
+function openTimedEffects()
+    openOrCloseTimedEffects("true")
 end
 
 function closeTimedEffects()
-    timedEffectsList = {}
-    UI.setAttribute(timedEffectsUpID, "active", "false")
-    UI.setAttribute(timedEffectsDownID, "active", "false")
-    UI.setAttribute(timedEffect1ID, "active", "false")
-    UI.setAttribute(timedEffect2ID, "active", "false")
-    UI.setAttribute(timedEffect3ID, "active", "false")
-    UI.setAttribute(displayTimedEffectsTextID, "active", "false")
+    openOrCloseTimedEffects("false")
+end
+
+function openOrCloseTimedEffects(openOrClose)
+    UI.setAttribute(timedEffectsUpID, "active", openOrClose)
+    UI.setAttribute(timedEffectsDownID, "active", openOrClose)
+    UI.setAttribute(timedEffect1ID, "active", openOrClose)
+    UI.setAttribute(timedEffect2ID, "active", openOrClose)
+    UI.setAttribute(timedEffect3ID, "active", openOrClose)
+    UI.setAttribute(timedEffect4ID, "active", openOrClose)
+    UI.setAttribute(timedEffect5ID, "active", openOrClose)
+    UI.setAttribute(timedEffect1TargetsID, "active", openOrClose)
+    UI.setAttribute(timedEffect2TargetsID, "active", openOrClose)
+    UI.setAttribute(timedEffect3TargetsID, "active", openOrClose)
+    UI.setAttribute(timedEffect4TargetsID, "active", openOrClose)
+    UI.setAttribute(timedEffect5TargetsID, "active", openOrClose)
+    UI.setAttribute(timedEffect1TimeLeftID, "active", openOrClose)
+    UI.setAttribute(timedEffect2TimeLeftID, "active", openOrClose)
+    UI.setAttribute(timedEffect3TimeLeftID, "active", openOrClose)
+    UI.setAttribute(timedEffect4TimeLeftID, "active", openOrClose)
+    UI.setAttribute(timedEffect5TimeLeftID, "active", openOrClose)
+    UI.setAttribute(timedEffect1EffectLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect2EffectLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect3EffectLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect4EffectLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect5EffectLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect1TimeLeftLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect2TimeLeftLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect3TimeLeftLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect4TimeLeftLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect5TimeLeftLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect1TargetsLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect2TargetsLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect3TargetsLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect4TargetsLabelID, "active", openOrClose)
+    UI.setAttribute(timedEffect5TargetsLabelID, "active", openOrClose)
+    UI.setAttribute(displayTimedEffectsTextID, "active", openOrClose)
 end
 
 -- API functions:
@@ -1145,7 +1352,8 @@ function doAPIrefresh()
     -- goes to call getNextPlayer(), whiich calls the disaply functions
 end
 
-function loadPlayerData()
+function loadPlayerData() -- getPcs
+    print("getting PCs...")
     url = "http://" .. IP_ADDRESS .. ":" .. PORT .. GET_PCS_PATH
     -- print("url: " .. url)
     WebRequest.get(url, function(request)
@@ -1357,6 +1565,17 @@ function cutOutCRtext(str)
     -- print("non CR str: "..str)
 
     return str
+end
+
+function printNestedTable(inputTable) -- for testing & debugging only
+    print("inputTable: "..tostring(inputTable))
+    if inputTable == nil or #(inputTable) == 0 then return end
+     for tableNum,tempTable in ipairs(inputTable) do
+        print("table "..tableNum..": "..tostring(tempTable))
+        for itemNum,item in pairs(tempTable) do
+            print("item "..itemNum..": "..item)
+        end
+     end
 end
 
 function convertRoundsStrToTimeLeft(durationStringRounds)
