@@ -1,5 +1,5 @@
 <!-- XML for Tabletop Simulator Connector for D&D Combat Assistant -->
-<!-- Updated 6/5/2023 (Version 1.1) -->
+<!-- Updated 6/12/2023 (Version 1.2) -->
 <!-- For GUID replacement, make sure you follow this convention for any function names (note the spaces): onClick = "functionName" -->
 
 <Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-440 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
@@ -62,7 +62,7 @@
 
 <Panel id = "independentButtonsPanel">
     <Button id = "end_turn_button" rectAlignment = "LowerCenter" offsetXY = "0 150" width = "200" height = "60" color = "#ff6666" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" onClick = "apiEndTurn">End Turn</Button>
-    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "560 285" width = "200" height = "420" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false" raycastTarget = "false">Party roll list here</Button>
+    <Button id = "text_button_5" rectAlignment = "MiddleLeft" offsetXY = "560 285" width = "200" height = "420" colors = "#83a2d4|#83a2d4|#83a2d4|#83a2d4" fontStyle = "bold" fontSize = "16px" active = "false" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">Party roll list here</Button>
 </Panel>
 
 <Panel id = "timedEffectInteractionPanel" rectAlignment = "MiddleLeft" offsetXY = "80 -80" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">

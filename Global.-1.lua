@@ -1,6 +1,6 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
--- Updated 6/5/2023 (Version 1.1)
+-- Updated 6/12/2023 (Version 1.2)
 
 
 -- Tabletop Object variables:
@@ -21,7 +21,7 @@ PORT = "9001"
 
 GET_INITIATIVE_PATH = "/playermenu/getinitiative"
 ROLL_INITIATIVE_PATH = "/playermenu/rollinitiative"
-GET_PCS_PATH = "/playermenu/getpcs" -- use /getallpcs to also get PCs who are not in combat (not on the map)
+GET_PCS_PATH = "/playermenu/getpcs" -- use /getallpcs to also get PCs who are not in combat (not in the combat map)
 ADD_TO_MAP_PATH = "/playermenu/movetomap"
 NEXT_TURN_PATH = "/playermenu/nextturn"
 GET_CURRENT_PLAYER_PATH = "/playermenu/getcurrentcharacter"
@@ -175,6 +175,8 @@ pcSelectorActive = false
 timedEffectsList = {}
 fiveViewed = {1,2,3,4,5} -- indexes of viewed characters
 threeViewed = {1,2,3} -- indexes of viewed effects
+endRoundAdded = false
+endEffectAdded = false
 
 
 -- Core functions:
@@ -195,7 +197,7 @@ end
 
 function storeIPAddress(player, ipAddress, id)
     IP_ADDRESS = ipAddress
-    -- print("The current IP Address is: " .. ipAddress)
+    print("The current server IP Address is: " .. ipAddress)
     UI.setAttribute(changeIPAddressID, "active", "true")
     UI.setAttribute(changeIPAddressID, "visibility", "host")
     UI.setAttribute(inputIPAddressID, "active", "false")
@@ -462,7 +464,8 @@ function endCombat()
     UI.setAttribute(endTurnGmID, "active", "false")
     UI.setAttribute(endCombatID, "active", "false")
     UI.setAttribute(refreshCombatID, "color", SELECTED_GREY)
-    -- UI.setAttribute(addTimedEffectID, "active", "false")
+    UI.setAttribute(closeTimedEffectViewerID, "text", "Open Timed Effect Viewer")
+    UI.setAttribute(closeTimedEffectViewerID, "color", PROMPT_BLUE)
     closeTimedEffects()
     closeTurnOrder()
 end
@@ -678,7 +681,7 @@ function displayTurnOrder()
 end
 
 function receiveInitiativeStr(initiativeStr)
-    print("received: "..initiativeStr)
+    -- print("received: "..initiativeStr)
     initiativeOrderList = {{Name="",Bloodied=false,Armor=0,Resistances="",Reactions=""}}
     initiativeOrderList = getInitOrderListFromJsonStr(initiativeStr)
 end
@@ -715,8 +718,11 @@ function checkNumberOfInits()
     end
     UI.setAttribute(initTextID, "active", "true")
     UI.setAttribute(initTextID, "text", "Initiatve Order ("..numberOfPeopleInInitiative.." characters):")
-    table.insert(initiativeOrderList, {Name="↻",Bloodied=false,Armor=0,Resistances="",Reactions=""}) -- round end
-    numberOfPeopleInInitiative = numberOfPeopleInInitiative + 1
+    if numberOfPeopleInInitiative > 5 and endRoundAdded == false then
+        table.insert(initiativeOrderList, {Name="↻",Bloodied=false,Armor=0,Resistances="",Reactions=""}) -- round end
+        numberOfPeopleInInitiative = numberOfPeopleInInitiative + 1
+        endRoundAdded = true
+    end
     setBlankTurnsInactive()
     getToCurrChar()
     refresh5Inits()
@@ -1004,6 +1010,7 @@ function addTimedEffectName(player, effName, id)
 end
 
 function addTimedEffectEffect(player, effectEffect, id)
+    -- print("effect XML test: "..effectEffect)
     timedEffectEffect = effectEffect
 end
 
@@ -1079,22 +1086,49 @@ function checkNumberOfEffects()
     UI.setAttribute(closeTimedEffectViewerID, "color", BUTTON_COLOR_6)
     UI.setAttribute(displayTimedEffectsTextID, "active", "true")
     UI.setAttribute(displayTimedEffectsTextID, "text", "Current Effects ("..numberOfEffects.."):")
-    table.insert(timedEffectsList, {Name="Timed Effects End",Effect="",Targets="",Duration="",Number=0})
-    numberOfEffects = numberOfEffects + 1
+    if numberOfEffects > 5  and endEffectAdded == false then
+        table.insert(timedEffectsList, {Name="Timed Effects End",Effect="",Targets="",Duration="",Number=0})
+        numberOfEffects = numberOfEffects + 1
+        endEffectAdded = true
+    end
     setBlankTimedEffectsInactive()
-    threeViewed = {1,2,3,4,5} -- threeViewed does 5 now (yes its confusing i'll change the name later)
+    threeViewed = {1,2,3,4,5} -- threeViewed does 5 now (yes its confusing, i'll change the name later)
     refresh3TimedEffects() 
 end
 
 function setBlankTimedEffectsInactive()
+    -- print("setting blank "..5-numberOfEffects.." events")
     if 0 < numberOfEffects and numberOfEffects < 5 then
         UI.setAttribute(timedEffect5ID, "active", "false")
+        UI.setAttribute(timedEffect5TargetsID, "active", "false")
+        UI.setAttribute(timedEffect5TimeLeftID, "active", "false")
+        UI.setAttribute(timedEffect5EffectLabelID, "active", "false")
+        UI.setAttribute(timedEffect5TargetsLabelID, "active", "false")
+        UI.setAttribute(timedEffect5TimeLeftLabelID, "active", "false")
+
         if 0 < numberOfEffects and numberOfEffects < 4 then
             UI.setAttribute(timedEffect4ID, "active", "false")
+            UI.setAttribute(timedEffect4TargetsID, "active", "false")
+            UI.setAttribute(timedEffect4TimeLeftID, "active", "false")
+            UI.setAttribute(timedEffect4EffectLabelID, "active", "false")
+            UI.setAttribute(timedEffect4TargetsLabelID, "active", "false")
+            UI.setAttribute(timedEffect4TimeLeftLabelID, "active", "false")
+
             if 0 < numberOfEffects and numberOfEffects < 3 then
                 UI.setAttribute(timedEffect3ID, "active", "false")
+                UI.setAttribute(timedEffect3TargetsID, "active", "false")
+                UI.setAttribute(timedEffect3TimeLeftID, "active", "false")
+                UI.setAttribute(timedEffect3EffectLabelID, "active", "false")
+                UI.setAttribute(timedEffect3TargetsLabelID, "active", "false")
+                UI.setAttribute(timedEffect3TimeLeftLabelID, "active", "false")
+
                 if numberOfEffects == 1 then
                     UI.setAttribute(timedEffect2ID, "active", "false")
+                    UI.setAttribute(timedEffect2TargetsID, "active", "false")
+                    UI.setAttribute(timedEffect2TimeLeftID, "active", "false")
+                    UI.setAttribute(timedEffect2EffectLabelID, "active", "false")
+                    UI.setAttribute(timedEffect2TargetsLabelID, "active", "false")
+                    UI.setAttribute(timedEffect2TimeLeftLabelID, "active", "false")
                 end
             end
         end
@@ -1290,10 +1324,10 @@ function makeTimedEffectTextButton(timedEffectNumber, tempTimedEffectList)
 end
 
 function timedEffectViewToggle()
-    if UI.getAttribute(closeTimedEffectViewerID, "text") == "Open Timed Effect Viewer" then -- josh only 2 toher ways to open it are refesh init & add timed effect
+    if UI.getAttribute(closeTimedEffectViewerID, "text") == "Open Timed Effect Viewer" then
         UI.setAttribute(closeTimedEffectViewerID, "text", "Close Timed Effect Viewer")
         UI.setAttribute(closeTimedEffectViewerID, "color", BUTTON_COLOR_6)
-        openTimedEffects()
+        checkNumberOfEffects() -- open the timed effects
     else
         UI.setAttribute(closeTimedEffectViewerID, "text", "Open Timed Effect Viewer")
         UI.setAttribute(closeTimedEffectViewerID, "color", PROMPT_BLUE)
@@ -1301,49 +1335,43 @@ function timedEffectViewToggle()
     end    
 end
 
-function openTimedEffects()
-    openOrCloseTimedEffects("true")
-end
-
 function closeTimedEffects()
-    openOrCloseTimedEffects("false")
+    UI.setAttribute(timedEffectsUpID, "active", "false")
+    UI.setAttribute(timedEffectsDownID, "active", "false")
+    UI.setAttribute(timedEffect1ID, "active", "false")
+    UI.setAttribute(timedEffect2ID, "active", "false")
+    UI.setAttribute(timedEffect3ID, "active", "false")
+    UI.setAttribute(timedEffect4ID, "active", "false")
+    UI.setAttribute(timedEffect5ID, "active", "false")
+    UI.setAttribute(timedEffect1TargetsID, "active", "false")
+    UI.setAttribute(timedEffect2TargetsID, "active", "false")
+    UI.setAttribute(timedEffect3TargetsID, "active", "false")
+    UI.setAttribute(timedEffect4TargetsID, "active", "false")
+    UI.setAttribute(timedEffect5TargetsID, "active", "false")
+    UI.setAttribute(timedEffect1TimeLeftID, "active", "false")
+    UI.setAttribute(timedEffect2TimeLeftID, "active", "false")
+    UI.setAttribute(timedEffect3TimeLeftID, "active", "false")
+    UI.setAttribute(timedEffect4TimeLeftID, "active", "false")
+    UI.setAttribute(timedEffect5TimeLeftID, "active", "false")
+    UI.setAttribute(timedEffect1EffectLabelID, "active", "false")
+    UI.setAttribute(timedEffect2EffectLabelID, "active", "false")
+    UI.setAttribute(timedEffect3EffectLabelID, "active", "false")
+    UI.setAttribute(timedEffect4EffectLabelID, "active", "false")
+    UI.setAttribute(timedEffect5EffectLabelID, "active", "false")
+    UI.setAttribute(timedEffect1TimeLeftLabelID, "active", "false")
+    UI.setAttribute(timedEffect2TimeLeftLabelID, "active", "false")
+    UI.setAttribute(timedEffect3TimeLeftLabelID, "active", "false")
+    UI.setAttribute(timedEffect4TimeLeftLabelID, "active", "false")
+    UI.setAttribute(timedEffect5TimeLeftLabelID, "active", "false")
+    UI.setAttribute(timedEffect1TargetsLabelID, "active", "false")
+    UI.setAttribute(timedEffect2TargetsLabelID, "active", "false")
+    UI.setAttribute(timedEffect3TargetsLabelID, "active", "false")
+    UI.setAttribute(timedEffect4TargetsLabelID, "active", "false")
+    UI.setAttribute(timedEffect5TargetsLabelID, "active", "false")
+    UI.setAttribute(displayTimedEffectsTextID, "active", "false")
 end
 
-function openOrCloseTimedEffects(openOrClose)
-    UI.setAttribute(timedEffectsUpID, "active", openOrClose)
-    UI.setAttribute(timedEffectsDownID, "active", openOrClose)
-    UI.setAttribute(timedEffect1ID, "active", openOrClose)
-    UI.setAttribute(timedEffect2ID, "active", openOrClose)
-    UI.setAttribute(timedEffect3ID, "active", openOrClose)
-    UI.setAttribute(timedEffect4ID, "active", openOrClose)
-    UI.setAttribute(timedEffect5ID, "active", openOrClose)
-    UI.setAttribute(timedEffect1TargetsID, "active", openOrClose)
-    UI.setAttribute(timedEffect2TargetsID, "active", openOrClose)
-    UI.setAttribute(timedEffect3TargetsID, "active", openOrClose)
-    UI.setAttribute(timedEffect4TargetsID, "active", openOrClose)
-    UI.setAttribute(timedEffect5TargetsID, "active", openOrClose)
-    UI.setAttribute(timedEffect1TimeLeftID, "active", openOrClose)
-    UI.setAttribute(timedEffect2TimeLeftID, "active", openOrClose)
-    UI.setAttribute(timedEffect3TimeLeftID, "active", openOrClose)
-    UI.setAttribute(timedEffect4TimeLeftID, "active", openOrClose)
-    UI.setAttribute(timedEffect5TimeLeftID, "active", openOrClose)
-    UI.setAttribute(timedEffect1EffectLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect2EffectLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect3EffectLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect4EffectLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect5EffectLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect1TimeLeftLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect2TimeLeftLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect3TimeLeftLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect4TimeLeftLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect5TimeLeftLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect1TargetsLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect2TargetsLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect3TargetsLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect4TargetsLabelID, "active", openOrClose)
-    UI.setAttribute(timedEffect5TargetsLabelID, "active", openOrClose)
-    UI.setAttribute(displayTimedEffectsTextID, "active", openOrClose)
-end
+
 
 -- API functions:
 
@@ -1392,6 +1420,7 @@ function apiGetInit()
             print("error: " .. request.text)
         else
             receiveInitiativeStr(request.text) -- converts to list
+            endRoundAdded = false
             checkNumberOfInits() -- populates the textButtons
         end
     end)
@@ -1406,6 +1435,7 @@ function apiGetTimedEffects()
             print("error: " .. request.text)
         else
             receiveTimedEffects(request.text) -- convert to a list
+            endEffectAdded = false -- avoid duplicate end of turn labels
             checkNumberOfEffects() -- will populate the textButtons
         end
     end)
