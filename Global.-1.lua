@@ -1,6 +1,6 @@
 -- Tabletop Simulator Connector for D&D Combat Assistant
 -- Made by Benjamin Kim & Joshua Haynes, April 2023
--- Updated 6/12/2023 (Version 1.2)
+-- Updated 7/1/2023 (Version 1.3)
 
 
 -- Tabletop Object variables:
@@ -898,7 +898,7 @@ function makeInitTextButton(initSlotID, initChar)
                 UI.setAttribute(initSlotID, "colors", DEFAULT_BLUE_GREYs) -- color default, text default
             end
         end
-        if initChar.Bloodied then
+        if initChar ~= nil and initChar.Bloodied then -- make sure not to index a null initChar (why is it null?)
             UI.setAttribute(initSlotID, "textColor", BLOODIED_RED) -- red text
         else
             UI.setAttribute(initSlotID, "textColor", BLACK)
@@ -929,7 +929,7 @@ end
 -- Timed Effect functions:
 
 function addTimedEffect(player)
-    local playerName = findPlayerNameFromColor(player.color)
+    local playerName = findPlayerNameFromColor(player.color) -- already returns "Somebody" if black
     broadcastToAll(playerName.." is adding a timed effect...")
     setTimedEffectColor(player.color)
     playerNameLabel = playerName.."\'s "
@@ -1037,8 +1037,13 @@ function confirmTimedEffect(player, id)
         return
     end
     if isNotEmpty(effectName) then
-        timedEffectListToSend = "{\"name\":\""..playerName.."\'s "..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
-        -- print("timedEffectListToSend: "..timedEffectListToSend)
+        playerEnteringEffect = findPlayerNameFromColor(player.color)
+        if playerEnteringEffect ~= "Somebody" then
+            timedEffectListToSend = "{\"name\":\""..playerName.."\'s "..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration..",\"charNameForInitAdded\":\""..playerEnteringEffect.."\"}"
+        else
+            timedEffectListToSend = "{\"name\":\""..playerName.."\'s "..effectName.."\",\"effect\":\""..timedEffectEffect.."\",\"targets\":\""..effectTargets.."\",\"durationRounds\":"..effectDuration.."}"
+        end
+        print("timedEffectListToSend: "..timedEffectListToSend)
         apiAddTimedEffect(timedEffectListToSend, player.color)
     else
         broadcastToColor("You cannot create a timed effect without a name!", player.color)
@@ -1047,7 +1052,7 @@ function confirmTimedEffect(player, id)
 end
 
 function receiveTimedEffects(timedEffectsStr)
-    -- print("received: "..timedEffectsStr)
+    print("received: "..timedEffectsStr)
     timedEffectsList = {{Name="",Effect="",Targets="",Duration="",Number=0}}
     timedEffectsList = getTimedEffectListFromJson(timedEffectsStr)
     -- print(timedEffectsList[1].Name)
@@ -1497,6 +1502,8 @@ end
 
 function findPlayerNameFromColor(playerColor)
     -- find player name
+    playerName = ""
+    -- print("player color: " .. playerColor)
     if playerColor == "Purple" then
         playerName = playerColorMap.Purple
     else
@@ -1610,6 +1617,7 @@ end
 
 function convertRoundsStrToTimeLeft(durationStringRounds)
     local fullTimeNum = tonumber(durationStringRounds)
+    -- print("timed effect fullTimeNum = "..fullTimeNum)
     local timeStr = ""
     local years = 0
     local days = 0
@@ -1731,7 +1739,8 @@ function convertRoundsStrToTimeLeft(durationStringRounds)
         
         timeStr = string.sub(timeStr, 1, string.len(timeStr)-2)
     else
-        timeStr = "0 rounds" -- this should never happen
+        -- print("time left = 0")
+        timeStr = "Ends this round" -- might re-word this
     end
     return timeStr
 end
