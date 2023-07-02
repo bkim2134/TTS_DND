@@ -1,5 +1,5 @@
 <!-- XML for Tabletop Simulator Connector for D&D Combat Assistant -->
-<!-- Updated 6/12/2023 (Version 1.2) -->
+<!-- Updated 7/1/2023 (Version 1.3) -->
 <!-- For GUID replacement, make sure you follow this convention for any function names (note the spaces): onClick = "functionName" -->
 
 <Panel id = "ipSelectorPanel" rectAlignment = "UpperRight" offsetXY = "-440 -10" width = "0" height = "0" padding = "0.0, 0.0, 0.0, 0.0" allowDragging = "true" returnToOriginalPositionWhenReleased = "false">
